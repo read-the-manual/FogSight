@@ -27,7 +27,8 @@ body { display: flex; flex-direction: column; overflow: hidden; user-select: non
 .drive-nums { display: flex; justify-content: space-between; font-size: var(--fs-sm); color: var(--dim); }
 .drive-nums b { color: var(--fg); font-weight: var(--fw-medium); }
 
-.home-foot { margin-top: auto; padding-top: var(--sp-5); display: flex; justify-content: flex-end; }
+.home-foot { margin-top: auto; padding-top: var(--sp-5); display: flex; align-items: center; justify-content: flex-end; gap: var(--sp-3); flex-wrap: wrap; }
+#openSettings svg { width: 16px; height: 16px; fill: none; stroke: currentColor; }
 
 /* ---------- ② 扫描中 ---------- */
 #scanning { align-items: center; justify-content: center; }
