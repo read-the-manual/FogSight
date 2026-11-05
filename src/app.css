@@ -1,0 +1,109 @@
+/* 雾见自己的样式。通用的颜色、字体、组件都来自 设计包。 */
+
+body { display: flex; flex-direction: column; overflow: hidden; user-select: none; }
+.screen { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.screen[hidden] { display: none; }
+.row { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+
+/* ---------- ① 首页 ---------- */
+#home { overflow: auto; }
+.home-inner {
+  width: min(880px, 100%); margin: 0 auto; padding: 56px var(--sp-5) var(--sp-5);
+  display: flex; flex-direction: column; gap: var(--sp-5); min-height: 100%;
+}
+.brand h1 { font-size: 44px; font-weight: var(--fw-bold); letter-spacing: .04em; }
+.brand p { margin: var(--sp-1) 0 0; }
+.hint-line { font-size: var(--fs-sm); }
+
+.drives { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--sp-4); }
+.drive {
+  text-align: left; font: inherit; color: inherit;
+  display: flex; flex-direction: column; gap: var(--sp-2);
+  padding: var(--sp-4) var(--sp-4) var(--sp-4);
+}
+.drive-top { display: flex; align-items: baseline; gap: var(--sp-2); }
+.drive-letter { font-size: var(--fs-xxl); font-weight: var(--fw-bold); line-height: 1; }
+.drive-label { color: var(--faint); font-size: var(--fs-sm); }
+.drive-nums { display: flex; justify-content: space-between; font-size: var(--fs-sm); color: var(--dim); }
+.drive-nums b { color: var(--fg); font-weight: var(--fw-medium); }
+
+.home-foot { margin-top: auto; padding-top: var(--sp-5); display: flex; justify-content: flex-end; }
+
+/* ---------- ② 扫描中 ---------- */
+#scanning { align-items: center; justify-content: center; }
+.scan-inner { width: min(520px, 90%); display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); text-align: center; }
+.scan-count { font-size: 64px; font-weight: var(--fw-bold); line-height: 1.05; }
+.scan-count small { font-size: var(--fs-lg); font-weight: var(--fw-regular); color: var(--dim); margin-left: var(--sp-2); }
+.scan-inner .progress { width: 100%; margin-top: var(--sp-3); }
+.scan-path {
+  width: 100%; font-size: var(--fs-xs); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  direction: rtl; text-align: center;   /* 路径太长时省略前面，保留最后的文件夹名 */
+}
+
+/* ---------- ③ 结果 ---------- */
+.crumbs-bar {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid var(--line-soft);
+}
+.crumbs { flex: 1; min-width: 0; display: flex; align-items: center; gap: 2px; overflow: hidden; white-space: nowrap; }
+.crumb {
+  font: inherit; font-size: var(--fs-sm); color: var(--dim); background: none; border: 0;
+  padding: 4px 8px; border-radius: var(--r-sm); cursor: pointer; max-width: 220px;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.crumb:hover { background: var(--accent-soft); color: var(--fg); }
+.crumb:last-child { color: var(--fg); font-weight: var(--fw-medium); }
+.crumb-sep { color: var(--faint); font-size: var(--fs-xs); }
+
+.map { position: relative; flex: 1; min-height: 0; margin: var(--sp-3); }
+.stones { position: absolute; inset: 0; }
+.stones.enter { animation: stones-in var(--dur-slow) var(--ease); }
+@keyframes stones-in { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
+
+/* 石块的颜色从哪来：大多数主题用文字色调出中性灰阶，只带一丝主色（深色底上铺大片主色会混成泥色）；
+   Claude 橙是奶油底，橙色混进浅色里是干净的杏色、蜜桃色，所以石块直接用橙色，越大越橙 */
+:root { --stone: var(--fg); --stone-k: 1; --stone-ring: var(--accent); }
+[data-theme="claude"] { --stone: var(--accent); --stone-k: 4.5; --stone-ring: var(--fg); }
+
+.stone {
+  position: absolute; overflow: hidden;
+  background: color-mix(in srgb, var(--accent) 4%,
+              color-mix(in srgb, var(--stone) calc(var(--tint, 6%) * var(--stone-k)), var(--card)));
+  border: 1px solid var(--line-soft);
+  transition: filter var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+  cursor: default;
+}
+.stone.dir { cursor: pointer; }
+.stone.file { background: var(--card); border-color: var(--line); }
+.stone.small, .stone.other { background: transparent; border: 1px dashed var(--line); }
+.stone:hover { box-shadow: 0 0 0 2px var(--stone-ring); z-index: 2; }
+.stone.picked { box-shadow: 0 0 0 2px var(--stone-ring), 0 0 0 6px var(--accent-soft); z-index: 2; }
+
+.stone-label { position: absolute; left: 10px; top: 7px; right: 8px; line-height: 1.35; pointer-events: none; }
+.stone-name { font-size: var(--fs-sm); font-weight: var(--fw-medium); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stone-size { font-size: var(--fs-xs); color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stone.big .stone-name { font-size: var(--fs-md); }
+.stone.big .stone-size { font-size: var(--fs-sm); }
+
+/* 文件夹石子里面的小石子：只是预览，给个纹理 */
+.pebble {
+  position: absolute; pointer-events: none;
+  background: color-mix(in srgb, var(--bg) 40%, transparent);   /* 像压在石头上的浅坑，不再是一层灰膜 */
+}
+
+/* 角落的雾面玻璃信息卡：下面的石子还能透出来，鼠标也能穿过它 */
+.corner {
+  position: absolute; left: var(--sp-4); bottom: var(--sp-4); z-index: 5;
+  min-width: 240px; max-width: min(420px, 60%);
+  padding: var(--sp-3) var(--sp-4) var(--sp-3);
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  backdrop-filter: blur(14px) saturate(1.1);
+  border: 1px solid var(--line-soft); border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  pointer-events: none;
+}
+.corner-kind { font-size: var(--fs-xs); }
+.corner-name { font-size: var(--fs-lg); font-weight: var(--fw-medium); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.corner-size { font-size: 34px; font-weight: var(--fw-bold); line-height: 1.15; }
+.corner-size .dim { font-size: var(--fs-md); font-weight: var(--fw-regular); margin-left: var(--sp-2); }
+.corner-meta { font-size: var(--fs-xs); margin-top: 2px; }

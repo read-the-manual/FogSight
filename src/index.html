@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>雾见</title>
+<link rel="stylesheet" href="设计包/css/基础.css">
+<link rel="stylesheet" href="设计包/css/组件.css">
+<link rel="stylesheet" href="app.css">
+<script src="设计包/组件/主题列表.js"></script>
+<script src="设计包/组件/主题.js"></script>
+<script>Theme.init()</script>
+</head>
+<body>
+<div id="tb"></div>
+
+<!-- ① 首页：选磁盘 -->
+<section class="screen" id="home">
+  <div class="home-inner">
+    <header class="brand">
+      <h1>雾见</h1>
+      <p class="dim">拨开雾，看看磁盘空间都去哪了</p>
+    </header>
+    <div class="drives" id="drives"></div>
+    <div class="row">
+      <button class="btn soft" id="pickFolder">扫描某个文件夹…</button>
+      <span class="faint hint-line">只看不删：雾见不会改动你的任何文件</span>
+    </div>
+    <footer class="home-foot">
+      <div id="picker"></div>
+    </footer>
+  </div>
+</section>
+
+<!-- ② 扫描中 -->
+<section class="screen" id="scanning" hidden>
+  <div class="scan-inner">
+    <div class="dim" id="scanTitle">正在扫描</div>
+    <div class="scan-count num"><span id="scanFiles">0</span><small>个文件</small></div>
+    <div class="dim num" id="scanBytes">已找到 0 B</div>
+    <div class="progress" id="scanBar"></div>
+    <div class="faint scan-path" id="scanPath">&nbsp;</div>
+    <button class="btn ghost" id="cancelScan">取消</button>
+  </div>
+</section>
+
+<!-- ③ 结果：石子路 -->
+<section class="screen" id="result" hidden>
+  <nav class="crumbs-bar">
+    <button class="btn ghost icon" id="goUp" data-tip="上一层（Backspace）" data-tip-pos="bottom" aria-label="上一层">
+      <svg viewBox="0 0 16 16" width="16" height="16"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="crumbs" id="crumbs"></div>
+    <button class="btn ghost sm" id="reveal">在资源管理器中显示</button>
+    <button class="btn ghost sm" id="rescan">重新扫描</button>
+    <button class="btn ghost sm" id="goHome">换一个</button>
+  </nav>
+  <div class="map" id="map">
+    <div class="stones" id="stones"></div>
+    <aside class="corner" id="corner">
+      <div class="corner-kind faint" id="cKind"></div>
+      <div class="corner-name" id="cName"></div>
+      <div class="corner-size num"><span id="cSize"></span><span class="dim" id="cPct"></span></div>
+      <div class="corner-meta faint" id="cMeta"></div>
+    </aside>
+  </div>
+</section>
+
+<script src="设计包/组件/标题栏.js"></script>
+<script src="mock.js"></script>
+<script src="api.js"></script>
+<script src="layout.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

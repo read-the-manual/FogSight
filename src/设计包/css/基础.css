@@ -1,0 +1,194 @@
+/* ⚠ 这个文件是 色板/生成.py 自动生成的，别直接改：改 色板/themes.json 后重新运行生成.py */
+
+/* 英文和数字用 Nunito（SIL OFL，见 字体/OFL-Nunito.txt），可变字重 200–1000。
+   汉字用 975 圆体（SIL OFL，见 字体/OFL-975圆体.txt），压缩版只含常用字，400 / 500 / 700 三档。
+   975 圆体里没有的生僻字，浏览器会自动用微软雅黑显示（系统自带，不打包）。 */
+@font-face {
+  font-family: "Nunito";
+  src: url("../字体/Nunito.ttf") format("truetype");
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Nunito";
+  src: url("../字体/Nunito-Italic.ttf") format("truetype");
+  font-weight: 200 1000;
+  font-style: italic;
+  font-display: swap;
+}
+/* 975 圆体只有三档：把 100–1000 的字重分给最接近的那档，Nunito 调到多粗，汉字就跟到相近的粗细 */
+@font-face { font-family: "975Yuan"; src: url("../字体/975Yuan-400.woff2") format("woff2"); font-weight: 100 449; font-display: swap; }
+@font-face { font-family: "975Yuan"; src: url("../字体/975Yuan-500.woff2") format("woff2"); font-weight: 450 649; font-display: swap; }
+@font-face { font-family: "975Yuan"; src: url("../字体/975Yuan-700.woff2") format("woff2"); font-weight: 650 1000; font-display: swap; }
+
+:root {
+  --font: "Nunito", "975Yuan", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
+  --font-mono: "Cascadia Mono", Consolas, "Microsoft YaHei UI", monospace;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-md: 14px;
+  --fs-lg: 16px;
+  --fs-xl: 20px;
+  --fs-xxl: 28px;
+  --fs-hero: 40px;
+  --fw-light: 300;
+  --fw-regular: 400;
+  --fw-medium: 600;
+  --fw-bold: 800;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-pill: 999px;
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --dur-fast: 120ms;
+  --dur-mid: 200ms;
+  --dur-slow: 360ms;
+  --ease: cubic-bezier(.2,.7,.3,1);
+}
+
+:root, [data-theme="paper"] {
+  color-scheme: light;
+  --bg: #f4efe6;
+  --panel: #ebe4d8;
+  --card: #faf7f1;
+  --line: #d9cfbf;
+  --fg: #2b2621;
+  --dim: #6b6157;
+  --faint: #8f8478;
+  --accent: #3d352e;
+  --accent-hi: #574c42;
+  --ink: #f7f2ea;
+  --warn: #a34a3c;
+  --warn-bg: #f3e1da;
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, transparent);
+  --line-soft: color-mix(in srgb, var(--line) 60%, transparent);
+  --shadow: 0 6px 24px color-mix(in srgb, #000 12%, transparent);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #151515;
+  --panel: #1c1c1c;
+  --card: #242424;
+  --line: #333333;
+  --fg: #e8e6e3;
+  --dim: #a09c97;
+  --faint: #77736e;
+  --accent: #e8e6e3;
+  --accent-hi: #ffffff;
+  --ink: #151515;
+  --warn: #e8a387;
+  --warn-bg: #2c221d;
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, transparent);
+  --line-soft: color-mix(in srgb, var(--line) 60%, transparent);
+  --shadow: 0 6px 24px color-mix(in srgb, #000 40%, transparent);
+}
+
+[data-theme="claude"] {
+  color-scheme: light;
+  --bg: #f8f5ee;
+  --panel: #efeadf;
+  --card: #fdfbf7;
+  --line: #e3dacb;
+  --fg: #2a2420;
+  --dim: #6c6157;
+  --faint: #8b8076;
+  --accent: #D97757;
+  --accent-hi: #e38a6b;
+  --ink: #2a120a;
+  --warn: #a83f3a;
+  --warn-bg: #f8e2db;
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, transparent);
+  --line-soft: color-mix(in srgb, var(--line) 60%, transparent);
+  --shadow: 0 6px 24px color-mix(in srgb, #000 12%, transparent);
+}
+
+[data-theme="seaglass"] {
+  color-scheme: dark;
+  --bg: #16191d;
+  --panel: #1f2328;
+  --card: #262b31;
+  --line: #30363d;
+  --fg: #d8dee4;
+  --dim: #8b949e;
+  --faint: #6a747e;
+  --accent: #A9D3C5;
+  --accent-hi: #c3e3d8;
+  --ink: #10201a;
+  --warn: #D3A9B7;
+  --warn-bg: #2c2126;
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, transparent);
+  --line-soft: color-mix(in srgb, var(--line) 60%, transparent);
+  --shadow: 0 6px 24px color-mix(in srgb, #000 40%, transparent);
+}
+
+[data-theme="rose"] {
+  color-scheme: dark;
+  --bg: #1d1719;
+  --panel: #262022;
+  --card: #2f282b;
+  --line: #3d3438;
+  --fg: #ecdfe3;
+  --dim: #a8959b;
+  --faint: #7f6f74;
+  --accent: #E8A9BC;
+  --accent-hi: #f2c3d1;
+  --ink: #2a1219;
+  --warn: #E6C78F;
+  --warn-bg: #2d2619;
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, transparent);
+  --line-soft: color-mix(in srgb, var(--line) 60%, transparent);
+  --shadow: 0 6px 24px color-mix(in srgb, #000 40%, transparent);
+}
+
+/* ---------- 基础 ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { margin: 0; height: 100%; }
+
+body {
+  font-family: var(--font);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-regular);
+  line-height: 1.6;
+  color: var(--fg);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  transition: background var(--dur-mid) var(--ease), color var(--dur-mid) var(--ease);
+}
+
+::selection { background: var(--accent-soft); color: var(--fg); }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* 细滚动条，悬停才变明显 */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: var(--r-pill);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { background-color: var(--faint); }
+
+/* 文字层级 */
+.dim { color: var(--dim); }
+.faint { color: var(--faint); }
+.num { font-variant-numeric: tabular-nums; }   /* Nunito 的数字本来就等宽，这行留给别的字体 */
+.mono { font-family: var(--font-mono); }
+
+h1, h2, h3 { margin: 0; line-height: 1.25; font-weight: var(--fw-bold); }
+h1 { font-size: var(--fs-xxl); }
+h2 { font-size: var(--fs-xl); }
+h3 { font-size: var(--fs-lg); font-weight: var(--fw-medium); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0ms !important; animation-duration: 0ms !important; }
+}
