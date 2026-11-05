@@ -1,4 +1,4 @@
-"""画雾见的图标：纸色圆角方块上三块石子（墨色、Claude 橙、海青），输出 src-tauri/icons/icon.ico 和 icon.png。
+"""画雾见的图标：纸色圆角方块上三个色块（墨色、Claude 橙、海青），输出 src-tauri/icons/icon.ico 和 icon.png。
 只用 Python 自带的库：逐像素超采样画圆角形状，再手写 PNG / ICO 编码。
 """
 import struct
@@ -19,7 +19,7 @@ STONES = [
 
 
 def in_superellipse(x, y, cx, cy, rx, ry, k):
-    # k 越大越方，越小越圆；这里用指数 2~4 之间的“方圆”形，像石子
+    # k 越大越方，越小越圆；这里用指数 2~4 之间的“方圆”形，像色块
     n = 2 + 2 * k
     return (abs(x - cx) / rx) ** n + (abs(y - cy) / ry) ** n <= 1
 

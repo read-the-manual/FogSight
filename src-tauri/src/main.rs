@@ -1,7 +1,9 @@
 // 发布版不弹黑色命令行窗口
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod clean;
 mod scan;
+mod win;
 
 use scan::{Node, Progress, ViewNode};
 use serde::Serialize;
@@ -46,6 +48,8 @@ fn drives() -> Vec<Drive> {
 
 #[derive(Serialize, Clone)]
 struct ProgressMsg {
+    /// 机械硬盘：已经改成少量线程顺序读
+    hdd: bool,
     files: u64,
     bytes: u64,
     denied: u64,
@@ -74,6 +78,7 @@ async fn scan(app: AppHandle, state: State<'_, App>, path: String) -> Result<Sum
     }
     let p = state.progress.clone();
     p.reset();
+    let hdd = win::is_hdd(&root);
 
     // 每 120 毫秒把进度发给界面一次
     let done = Arc::new(AtomicBool::new(false));
@@ -82,6 +87,7 @@ async fn scan(app: AppHandle, state: State<'_, App>, path: String) -> Result<Sum
         std::thread::spawn(move || {
             while !done.load(Relaxed) {
                 let msg = ProgressMsg {
+                    hdd,
                     files: p.files.load(Relaxed),
                     bytes: p.bytes.load(Relaxed),
                     denied: p.denied.load(Relaxed),
@@ -97,6 +103,12 @@ async fn scan(app: AppHandle, state: State<'_, App>, path: String) -> Result<Sum
     let (p2, root2) = (p.clone(), root.clone());
     let node = tauri::async_runtime::spawn_blocking(move || {
         let name: Box<str> = root2.display().to_string().into();
+        // 机械硬盘每换一个位置磁头都要移动，线程多了反而互相抢；只用 2 个线程，尽量顺着读
+        if hdd {
+            if let Ok(pool) = rayon::ThreadPoolBuilder::new().num_threads(2).build() {
+                return pool.install(|| scan::scan_dir(&root2, name, &p2));
+            }
+        }
         scan::scan_dir(&root2, name, &p2)
     })
     .await
@@ -160,11 +172,43 @@ fn reveal(state: State<'_, App>, trail: Vec<u32>) -> Result<(), String> {
     Ok(())
 }
 
+// ---------- C 盘专清 ----------
+
+#[tauri::command]
+async fn clean_overview() -> Result<clean::Overview, String> {
+    tauri::async_runtime::spawn_blocking(clean::overview).await.map_err(|e| format!("统计失败：{e}"))
+}
+
+#[tauri::command]
+async fn clean_run(ids: Vec<String>) -> Result<Vec<clean::CleanResult>, String> {
+    tauri::async_runtime::spawn_blocking(move || clean::run(&ids)).await.map_err(|e| format!("清理线程出错：{e}"))
+}
+
+#[tauri::command]
+fn clean_open(id: String) -> Result<(), String> {
+    clean::open_item(&id)
+}
+
+#[tauri::command]
+fn open_storage_settings() -> Result<(), String> {
+    clean::open_storage_settings()
+}
+
+#[tauri::command]
+fn relaunch_admin(app: AppHandle) -> Result<(), String> {
+    win::relaunch_as_admin()?;
+    app.exit(0);
+    Ok(())
+}
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .manage(App::default())
-        .invoke_handler(tauri::generate_handler![drives, scan, cancel_scan, view, reveal])
+        .invoke_handler(tauri::generate_handler![
+            drives, scan, cancel_scan, view, reveal,
+            clean_overview, clean_run, clean_open, open_storage_settings, relaunch_admin
+        ])
         .run(tauri::generate_context!())
         .expect("雾见启动失败");
 }

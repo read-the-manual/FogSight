@@ -1,5 +1,5 @@
-// 石子路布局：先用“方形树图”(squarified treemap) 把面积按大小分好，
-// 再给每块配上不规则的圆角，看起来像一块块铺开的石子。
+// 色块图布局：先用“方形树图”(squarified treemap) 把面积按大小分好，
+// 再给每块配上不规则的圆角，看起来像一块块铺开的色块。
 (function () {
   // 一行里最“细长”的那块有多细长，越接近 1 越方正
   function worst(row, side) {
@@ -39,14 +39,14 @@
     return rects;
   }
 
-  // 用名字算出一个固定的“随机数”，同一个文件夹每次的石子形状都一样
+  // 用名字算出一个固定的“随机数”，同一个文件夹每次的色块形状都一样
   function hash(str) {
     let h = 2166136261;
     for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
     return () => { h = Math.imul(h ^ (h >>> 15), 2246822507); h ^= h >>> 13; return ((h >>> 0) % 1000) / 1000; };
   }
 
-  // 四个角各不相同的圆角，像石子。
+  // 四个角各不相同的圆角，像一块块小石头。
   // 左上角放文字，圆角太大会把字切掉，所以左上角最多 12px
   function pebbleRadius(w, h, name) {
     const r = hash(name);

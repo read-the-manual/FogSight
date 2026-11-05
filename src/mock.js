@@ -80,5 +80,21 @@
     reveal: async (trail) => console.log("在资源管理器中显示（模拟）", trail),
     onProgress: async (fn) => { listeners.push(fn); },
     pickFolder: async () => "D:\\项目\\",
+    async cleanOverview() {
+      await sleep(400);
+      const it = (id, kind, admin, gb, count, path) => ({ id, kind, admin, size: gb * GB, count, path });
+      return { is_admin: false, items: [
+        it("user_temp", "delete", false, 5.43, 9486, "C:\\Temp"), it("win_temp", "delete", true, 0.21, 203),
+        it("recycle", "system", false, 36.96, 74), it("wu_cache", "delete", true, 0, 3),
+        it("delivery", "delete", true, 0, 0), it("browser", "delete", false, 1.3, 13748),
+        it("thumbs", "delete", false, 0.03, 15), it("dumps", "delete", true, 0.02, 20),
+        it("hibernate", "system", true, 12.7, 1), it("windows_old", "settings", false, 0, 0),
+        it("downloads", "info", false, 0.93, 1281, "C:\\Downloads"), it("wechat", "info", false, 0, 0), it("qq", "info", false, 0, 0),
+      ] };
+    },
+    async cleanRun(ids) { await sleep(600); return ids.map((id) => ({ id, freed: 1.2 * GB, failed: id === "browser" ? 12 : 0, error: null })); },
+    cleanOpen: async (id) => console.log("打开（模拟）", id),
+    openStorageSettings: async () => console.log("打开存储设置（模拟）"),
+    relaunchAdmin: async () => console.log("以管理员身份重新打开（模拟）"),
   };
 })();

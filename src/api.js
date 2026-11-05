@@ -12,6 +12,11 @@
     view: (trail) => invoke("view", { trail }),
     reveal: (trail) => invoke("reveal", { trail }),
     onProgress: (fn) => T.event.listen("scan-progress", (e) => fn(e.payload)),
+    cleanOverview: () => invoke("clean_overview"),
+    cleanRun: (ids) => invoke("clean_run", { ids }),
+    cleanOpen: (id) => invoke("clean_open", { id }),
+    openStorageSettings: () => invoke("open_storage_settings"),
+    relaunchAdmin: () => invoke("relaunch_admin"),
     pickFolder: () => T.dialog
       ? T.dialog.open({ directory: true, title: "选一个要扫描的文件夹" })
       : invoke("plugin:dialog|open", { options: { directory: true, title: "选一个要扫描的文件夹" } }),

@@ -1,4 +1,4 @@
-// 雾见主程序：首页选盘 → 扫描 → 石子路浏览
+// 雾见主程序：首页选盘 → 扫描 → 色块图浏览
 (function () {
   const $ = (id) => document.getElementById(id);
 
@@ -21,7 +21,7 @@
     trail: [],      // 从根开始每一层的位置
     names: [],      // 面包屑上显示的名字
     view: null,     // 当前这一层
-    picked: null,   // 点选的石子
+    picked: null,   // 点选的色块
   };
 
   // ---------- ① 首页 ----------
@@ -55,6 +55,7 @@
     $("scanBytes").textContent = `已找到 ${fmtSize(p.bytes)}`;
     if (st.used) $("scanBar").style.setProperty("--p", Math.min(99, p.bytes / st.used * 100) + "%");
     if (p.current) $("scanPath").textContent = p.current;
+    $("scanHint").hidden = !p.hdd;
   });
 
   async function startScan(path, used) {
@@ -65,6 +66,7 @@
     $("scanPath").innerHTML = "&nbsp;";
     $("scanBar").classList.toggle("busy", !used);
     $("scanBar").style.setProperty("--p", "0%");
+    $("scanHint").hidden = true;
     show("scanning");
     try {
       const s = await Api.scan(path);
@@ -83,7 +85,7 @@
   $("cancelScan").addEventListener("click", () => Api.cancel());
 
   // ---------- 浏览历史（跟 Windows 文件管理器一样的后退 / 前进）----------
-  // 每一步是 {home: true}（选磁盘的首页）或 {trail, names}（某个文件夹）
+  // 每一步是 {home: true}（选磁盘的首页）、{clean: true}（C 盘专清）或 {trail, names}（某个文件夹）
   let hist = [{ home: true }], pos = 0;
   const here = () => hist[pos];
 
@@ -91,6 +93,7 @@
     const h = here();
     updateNav();
     if (h.home) { show("home"); renderDrives(); return; }
+    if (h.clean) { show("clean"); Clean.show(fmtSize); return; }
     st.trail = [...h.trail];
     st.names = [...h.names];
     show("result");
@@ -106,17 +109,17 @@
   function forward() { if (pos < hist.length - 1) { pos++; render(); } }
   function up() {
     const h = here();
-    if (h.home || !h.trail.length) return;
+    if (h.home || h.clean || !h.trail.length) return;
     go({ trail: h.trail.slice(0, -1), names: h.names.slice(0, -1) });
   }
   function updateNav() {
     const h = here();
     $("goBack").disabled = pos === 0;
     $("goForward").disabled = pos >= hist.length - 1;
-    $("goUp").disabled = !!h.home || !h.trail.length;
+    $("goUp").disabled = !!h.home || !!h.clean || !h.trail.length;
   }
 
-  // ---------- ③ 石子路 ----------
+  // ---------- ③ 色块图 ----------
   async function loadView() {
     st.view = await Api.view(st.trail);
     st.picked = null;
@@ -193,7 +196,7 @@
           p.className = "pebble";
           Object.assign(p.style, { left: px + q.x + 1.5 + "px", top: py + q.y + 1.5 + "px",
             width: q.w - 3 + "px", height: q.h - 3 + "px", borderRadius: Layout.pebbleRadius(q.w, q.h, kids[j].name) });
-          // 只有够大的小石子才写字，小的保持干净
+          // 只有够大的小色块才写字，小的保持干净
           if (q.w >= 90 && q.h >= 36) {
             const lab = document.createElement("div");
             lab.className = "pebble-label";
@@ -275,6 +278,8 @@
   }
 
   $("goBack").addEventListener("click", back);
+  $("cleanBack").addEventListener("click", back);
+  $("openClean").addEventListener("click", () => go({ clean: true }));
   $("goForward").addEventListener("click", forward);
   $("goUp").addEventListener("click", up);
   $("goHome").addEventListener("click", () => go({ home: true }));
@@ -283,7 +288,7 @@
 
   // 键盘和鼠标侧键 → 后退 / 前进 / 上一层
   const NAV = { back, forward, up };
-  const navAllowed = (e) => $("scanning").hidden && !$("settings").open && !Keys.isRecording()
+  const navAllowed = (e) => $("scanning").hidden && !$("settings").open && !$("confirmClean").open && !Keys.isRecording()
     && !(e.target.matches && e.target.matches("input, textarea, select"));
   document.addEventListener("keydown", (e) => {
     if (!navAllowed(e)) return;
@@ -294,7 +299,7 @@
   ["mousedown", "auxclick"].forEach((t) => document.addEventListener(t, (e) => { if (e.button > 2) e.preventDefault(); }));
   document.addEventListener("mouseup", (e) => {
     if (e.button === 0 || e.button === 2 || !navAllowed(e)) return;
-    if (e.button === 1 && e.target.closest(".stone")) return;   // 中键点石子归“点石子”设置管
+    if (e.button === 1 && e.target.closest(".stone")) return;   // 中键点色块归“点色块”设置管
     const a = Keys.match(e);
     if (a) { e.preventDefault(); NAV[a](); }
   });

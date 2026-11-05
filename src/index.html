@@ -24,6 +24,7 @@
     <div class="drives" id="drives"></div>
     <div class="row">
       <button class="btn soft" id="pickFolder">扫描某个文件夹…</button>
+      <button class="btn soft" id="openClean">🧹 C 盘专清</button>
       <span class="faint hint-line">只看不删：雾见不会改动你的任何文件</span>
     </div>
     <footer class="home-foot">
@@ -41,11 +42,12 @@
     <div class="dim num" id="scanBytes">已找到 0 B</div>
     <div class="progress" id="scanBar"></div>
     <div class="faint scan-path" id="scanPath">&nbsp;</div>
+    <div class="faint scan-hint" id="scanHint" hidden>这是机械硬盘：已改成 2 个线程顺着读，减少磁头来回跳</div>
     <button class="btn ghost" id="cancelScan">取消</button>
   </div>
 </section>
 
-<!-- ③ 结果：石子路 -->
+<!-- ③ 结果：色块图 -->
 <section class="screen" id="result" hidden>
   <nav class="crumbs-bar">
     <div class="nav-btns">
@@ -76,6 +78,44 @@
   </div>
 </section>
 
+<!-- ④ C 盘专清 -->
+<section class="screen" id="clean" hidden>
+  <nav class="crumbs-bar">
+    <button class="btn ghost icon" id="cleanBack" data-tip="后退" data-tip-pos="bottom" data-tip-align="start" aria-label="后退">
+      <svg viewBox="0 0 16 16" width="16" height="16"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="crumbs"><span class="crumb">C 盘专清</span></div>
+  </nav>
+  <div class="clean-scroll">
+    <div class="clean-inner">
+      <header>
+        <h2>C 盘专清 🧹</h2>
+        <p class="dim">默认一个都不勾。每一项都写了删掉之后会怎样，看清楚再勾～ 删除是直接删，不进回收站。</p>
+      </header>
+      <div class="card clean-result" id="cleanResult" hidden></div>
+      <div id="cleanList"></div>
+    </div>
+  </div>
+  <footer class="clean-bar">
+    <span class="dim num" id="cleanSum">还没有勾选</span>
+    <button class="btn danger" id="cleanGo" disabled>清理…</button>
+  </footer>
+</section>
+
+<!-- 清理前的最后确认 -->
+<dialog class="settings confirm" id="confirmClean">
+  <div class="set-head"><h2>确认清理</h2></div>
+  <div class="set-body">
+    <p>下面这些会被<b>直接删除，不进回收站，删了就找不回来</b>：</p>
+    <ul class="confirm-list" id="confirmList"></ul>
+    <p class="confirm-total">一共大约 <b class="num" id="confirmTotal"></b></p>
+    <div class="row" style="justify-content: flex-end; margin-top: var(--sp-4)">
+      <button class="btn ghost" id="confirmCancel">取消</button>
+      <button class="btn danger" id="confirmOk">确认清理</button>
+    </div>
+  </div>
+</dialog>
+
 <!-- 设置 -->
 <dialog class="settings" id="settings">
   <div class="set-head">
@@ -98,7 +138,7 @@
       <h3>导航</h3>
       <p>点“+”之后按下想用的键或鼠标按键（侧键、中键都可以），按 Esc 取消。</p>
       <div id="bindList"></div>
-      <h3>点石子</h3>
+      <h3>点色块</h3>
       <div id="clickList"></div>
       <p style="margin-top: var(--sp-4)"><button class="btn sm" id="resetKeys">恢复默认按键</button></p>
     </section>
@@ -108,26 +148,33 @@
       <ul>
         <li><b>选位置</b>：首页点一个磁盘，或者“扫描某个文件夹…”</li>
         <li><b>等它扫完</b>：几十万个文件一般几秒钟，可以随时取消</li>
-        <li><b>看石子</b>：石子越大，占的空间越多。鼠标移上去，左下角显示名字、大小和占比</li>
+        <li><b>看色块</b>：色块越大，占的空间越多。鼠标移上去，左下角显示名字、大小和占比</li>
       </ul>
       <h3>怎么操作</h3>
       <ul>
-        <li><b>左键</b>点文件夹石子：进入这个文件夹</li>
-        <li><b>右键</b>点石子：在文件管理器里打开它</li>
+        <li><b>左键</b>点文件夹色块：进入这个文件夹</li>
+        <li><b>右键</b>点色块：在文件管理器里打开它</li>
         <li><b>后退 / 前进</b>：鼠标侧键（靠下的后退，靠上的前进），或者左上角的箭头，跟 Windows 文件管理器一样。在最外层再后退，就回到选磁盘的首页</li>
         <li>这些按键都可以在“按键”里改</li>
       </ul>
-      <h3>石子上的几种样子</h3>
+      <h3>色块上的几种样子</h3>
       <ul>
-        <li><b>有颜色的石子</b>：文件夹，里面的小石子是它装的东西</li>
-        <li><b>白色石子</b>：单个大文件</li>
+        <li><b>带底色的色块</b>：文件夹，里面的小色块是它装的东西</li>
+        <li><b>白底的色块</b>：单个大文件</li>
         <li><b>虚线框“零散小文件”</b>：小于 1 MB 的文件合在一起（太多了，单独画看不清）</li>
         <li><b>虚线框“其余 N 项”</b>：太小、没有单独画出来的文件夹和文件</li>
+      </ul>
+      <h3>C 盘专清</h3>
+      <ul>
+        <li>首页点“C 盘专清”，雾见会列出 C 盘上几个常见的“垃圾”位置和它们的大小</li>
+        <li>每一项都写了<b>删掉之后会怎样</b>，默认一个都不勾，勾了、并在最后确认窗口点“确认清理”才会删</li>
+        <li>删除是直接删，不进回收站。正在使用的文件会自动跳过</li>
+        <li>下载文件夹、微信和 QQ 的聊天文件是你自己的东西，雾见只显示大小，不帮你删</li>
       </ul>
       <h3>常见问题</h3>
       <ul>
         <li><b>为什么扫出来比“已用空间”少一点？</b> 有些系统文件夹需要管理员权限才能读取，雾见会跳过它们，扫完后左下角会写跳过了几个。右键雾见 → 以管理员身份运行，就能扫到</li>
-        <li><b>雾见会删我的文件吗？</b> 不会。雾见只读取文件大小，不会改动、移动或删除任何文件</li>
+        <li><b>雾见会删我的文件吗？</b> 浏览色块的时候不会，只读取文件大小。只有在 C 盘专清里你亲手勾选、确认过的项目才会被删除</li>
       </ul>
     </section>
 
@@ -149,6 +196,7 @@
 <script src="api.js"></script>
 <script src="layout.js"></script>
 <script src="keys.js"></script>
+<script src="clean.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
