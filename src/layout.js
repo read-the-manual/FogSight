@@ -46,12 +46,13 @@
     return () => { h = Math.imul(h ^ (h >>> 15), 2246822507); h ^= h >>> 13; return ((h >>> 0) % 1000) / 1000; };
   }
 
-  // 四个角各不相同的圆角，像石子
+  // 四个角各不相同的圆角，像石子。
+  // 左上角放文字，圆角太大会把字切掉，所以左上角最多 12px
   function pebbleRadius(w, h, name) {
     const r = hash(name);
     const base = Math.max(4, Math.min(36, Math.min(w, h) * 0.3));
     const c = () => Math.round(base * (0.65 + r() * 0.7));
-    return `${c()}px ${c()}px ${c()}px ${c()}px`;
+    return `${Math.min(c(), 12)}px ${c()}px ${c()}px ${c()}px`;
   }
 
   window.Layout = { squarify, pebbleRadius };

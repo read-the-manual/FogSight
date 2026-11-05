@@ -1,7 +1,8 @@
 // 设计包 · 自绘标题栏。窗口去掉系统边框后用它代替，颜色跟随主题，不会有白边。
 //
 //   <div id="tb"></div>
-//   Titlebar.mount(document.getElementById("tb"), { title: "雾见", sub: "v0.1" })
+//   Titlebar.mount(document.getElementById("tb"), { title: "雾见", sub: "v0.1",
+//     actions: [{ icon: "<svg …>", label: "设置", onClick: () => … }] })   // actions 可选：放在窗口按钮左边的额外按钮
 //
 // 在 Tauri 2 里使用需要：
 //   tauri.conf.json → app.withGlobalTauri: true；窗口设置 decorations: false, shadow: true
@@ -26,6 +27,7 @@
         <b data-tauri-drag-region></b><span class="faint" data-tauri-drag-region></span>
       </div>
       <div class="tb-btns">
+        <span class="tb-actions"></span>
         <button class="tb-btn" data-act="minimize" aria-label="最小化">${ICONS.min}</button>
         <button class="tb-btn" data-act="toggleMaximize" aria-label="最大化">${ICONS.max}</button>
         <button class="tb-btn close" data-act="close" aria-label="关闭">${ICONS.close}</button>
@@ -33,8 +35,19 @@
     // 标题用 textContent 填，防止标题里的字符被当成 HTML
     el.querySelector("b").textContent = opts.title || document.title;
     el.querySelector(".faint").textContent = opts.sub || "";
-    el.querySelectorAll(".tb-btn").forEach((b) =>
+    el.querySelectorAll(".tb-btn[data-act]").forEach((b) =>
       b.addEventListener("click", () => { const w = win(); if (w) w[b.dataset.act](); }));
+    const box = el.querySelector(".tb-actions");
+    (opts.actions || []).forEach((a) => {
+      const b = document.createElement("button");
+      b.className = "tb-btn";
+      b.innerHTML = a.icon;           // 图标由程序自己提供，不来自用户输入
+      b.setAttribute("aria-label", a.label);
+      b.dataset.tip = a.label;
+      b.dataset.tipPos = "bottom";
+      b.addEventListener("click", a.onClick);
+      box.append(b);
+    });
   }
 
   window.Titlebar = { mount };

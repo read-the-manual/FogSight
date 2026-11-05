@@ -71,15 +71,50 @@
       if (s.cancelled) { show("home"); return; }
       $("scanBar").style.setProperty("--p", "100%");
       st.summary = s;
-      st.names = [path.replace(/\\$/, "")];
-      show("result");
-      await loadView();
+      // 新的扫描从头记历史：首页 → 根目录
+      hist = [{ home: true }, { trail: [], names: [path.replace(/\\$/, "")] }];
+      pos = 1;
+      await render();
     } catch (e) {
       alert("扫描失败：" + e);
       show("home");
     }
   }
   $("cancelScan").addEventListener("click", () => Api.cancel());
+
+  // ---------- 浏览历史（跟 Windows 文件管理器一样的后退 / 前进）----------
+  // 每一步是 {home: true}（选磁盘的首页）或 {trail, names}（某个文件夹）
+  let hist = [{ home: true }], pos = 0;
+  const here = () => hist[pos];
+
+  async function render() {
+    const h = here();
+    updateNav();
+    if (h.home) { show("home"); renderDrives(); return; }
+    st.trail = [...h.trail];
+    st.names = [...h.names];
+    show("result");
+    await loadView();
+  }
+  function go(entry) {
+    hist = hist.slice(0, pos + 1);
+    hist.push(entry);
+    pos++;
+    render();
+  }
+  function back() { if (pos > 0) { pos--; render(); } }
+  function forward() { if (pos < hist.length - 1) { pos++; render(); } }
+  function up() {
+    const h = here();
+    if (h.home || !h.trail.length) return;
+    go({ trail: h.trail.slice(0, -1), names: h.names.slice(0, -1) });
+  }
+  function updateNav() {
+    const h = here();
+    $("goBack").disabled = pos === 0;
+    $("goForward").disabled = pos >= hist.length - 1;
+    $("goUp").disabled = !!h.home || !h.trail.length;
+  }
 
   // ---------- ③ 石子路 ----------
   async function loadView() {
@@ -100,13 +135,10 @@
       b.textContent = name;
       b.addEventListener("click", () => {
         if (i === st.names.length - 1) return;
-        st.trail = st.trail.slice(0, i);
-        st.names = st.names.slice(0, i + 1);
-        loadView();
+        go({ trail: st.trail.slice(0, i), names: st.names.slice(0, i + 1) });
       });
       box.append(b);
     });
-    $("goUp").disabled = st.trail.length === 0;
   }
 
   const KIND = { dir: "文件夹", file: "文件", small: "零散小文件（每个都小于 1 MB）", other: "太小没单独画出来的项目" };
@@ -161,19 +193,43 @@
           p.className = "pebble";
           Object.assign(p.style, { left: px + q.x + 1.5 + "px", top: py + q.y + 1.5 + "px",
             width: q.w - 3 + "px", height: q.h - 3 + "px", borderRadius: Layout.pebbleRadius(q.w, q.h, kids[j].name) });
+          // 只有够大的小石子才写字，小的保持干净
+          if (q.w >= 90 && q.h >= 36) {
+            const lab = document.createElement("div");
+            lab.className = "pebble-label";
+            const n = document.createElement("div");
+            n.className = "pebble-name";
+            n.textContent = kids[j].name;
+            lab.append(n);
+            if (q.h >= 52) {
+              const sz = document.createElement("div");
+              sz.className = "pebble-size num";
+              sz.textContent = fmtSize(kids[j].size);
+              lab.append(sz);
+            }
+            p.append(lab);
+          }
           el.append(p);
         });
       }
 
       el.addEventListener("mouseenter", () => showCorner(it));
       el.addEventListener("mouseleave", () => showCorner(st.picked));
-      el.addEventListener("click", () => {
+      // 左 / 右 / 中键各做什么，可以在设置 → 按键里改
+      const act = (btn, e) => {
+        e.preventDefault();
+        const a = Keys.clickAction(btn);
+        if (a === "explorer") return reveal(it);
+        if (a !== "enter") return;
         if (it.kind === "dir") return drill(it);
-        st.picked = st.picked === it ? null : it;
+        st.picked = st.picked === it ? null : it;   // 文件进不去，就选中它，左下角显示详情
         box.querySelectorAll(".picked").forEach((p) => p.classList.remove("picked"));
         if (st.picked) el.classList.add("picked");
         showCorner(st.picked);
-      });
+      };
+      el.addEventListener("click", (e) => act("left", e));
+      el.addEventListener("contextmenu", (e) => act("right", e));
+      el.addEventListener("auxclick", (e) => { if (e.button === 1) act("middle", e); });
       frag.append(el);
     });
     box.replaceChildren(frag);
@@ -200,42 +256,78 @@
     $("cPct").textContent = v.size ? `${(it.size / v.size * 100).toFixed(1)}%` : "";
     const parts = [];
     if (it.kind !== "file") parts.push(`${fmtNum(it.files)} 个文件`);
-    if (it.kind === "dir") parts.push(it.denied ? "没有权限读取" : "点击进入");
+    if (it.kind === "dir" && it.denied) parts.push("没有权限读取");
     if (it.kind === "other") parts.push(`共 ${fmtNum(it.count)} 项`);
     $("cMeta").textContent = parts.join(" · ");
   }
 
   function drill(it) {
-    st.trail.push(it.idx);
-    st.names.push(it.name);
-    loadView();
+    go({ trail: [...st.trail, it.idx], names: [...st.names, it.name] });
   }
 
-  function goUp() {
-    if (!st.trail.length) return;
-    st.trail.pop();
-    st.names.pop();
-    loadView();
+  // 在文件管理器里打开：文件夹直接打开，文件会被选中；合成出来的块打开当前文件夹
+  function reveal(it) {
+    const trail = it && it.idx >= 0 ? [...st.trail, it.idx] : st.trail;
+    Api.reveal(trail).catch((e) => alert("打不开文件管理器：" + e));
   }
 
-  $("goUp").addEventListener("click", goUp);
-  $("goHome").addEventListener("click", () => { show("home"); renderDrives(); });
+  $("goBack").addEventListener("click", back);
+  $("goForward").addEventListener("click", forward);
+  $("goUp").addEventListener("click", up);
+  $("goHome").addEventListener("click", () => go({ home: true }));
   $("rescan").addEventListener("click", () => startScan(st.path, st.used));
-  $("reveal").addEventListener("click", () => {
-    const p = st.picked;
-    const trail = p && p.idx >= 0 ? [...st.trail, p.idx] : st.trail;
-    Api.reveal(trail).catch((e) => alert(e));
-  });
+  $("reveal").addEventListener("click", () => reveal(st.picked));
+
+  // 键盘和鼠标侧键 → 后退 / 前进 / 上一层
+  const NAV = { back, forward, up };
+  const navAllowed = (e) => $("scanning").hidden && !$("settings").open && !Keys.isRecording()
+    && !(e.target.matches && e.target.matches("input, textarea, select"));
   document.addEventListener("keydown", (e) => {
-    if ($("result").hidden || e.target.matches("input, textarea")) return;
-    if (e.key === "Backspace" || e.key === "Escape") { e.preventDefault(); goUp(); }
+    if (!navAllowed(e)) return;
+    const a = Keys.match(e);
+    if (a) { e.preventDefault(); NAV[a](); }
+  });
+  // 侧键在网页里默认会触发“浏览器后退”，先拦住
+  ["mousedown", "auxclick"].forEach((t) => document.addEventListener(t, (e) => { if (e.button > 2) e.preventDefault(); }));
+  document.addEventListener("mouseup", (e) => {
+    if (e.button === 0 || e.button === 2 || !navAllowed(e)) return;
+    if (e.button === 1 && e.target.closest(".stone")) return;   // 中键点石子归“点石子”设置管
+    const a = Keys.match(e);
+    if (a) { e.preventDefault(); NAV[a](); }
+  });
+  // 界面里不需要浏览器自带的右键菜单
+  document.addEventListener("contextmenu", (e) => { if (!e.target.matches("input, textarea")) e.preventDefault(); });
+
+  // ---------- 设置 ----------
+  const dlg = $("settings");
+  function openSettings() {
+    Keys.renderSettings($("bindList"), $("clickList"));
+    dlg.showModal();
+  }
+  $("closeSettings").addEventListener("click", () => dlg.close());
+  dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });   // 点窗口外面关掉
+  dlg.querySelectorAll(".set-tab").forEach((t) => t.addEventListener("click", () => {
+    dlg.querySelectorAll(".set-tab").forEach((x) => x.setAttribute("aria-selected", String(x === t)));
+    dlg.querySelectorAll(".set-page").forEach((pg) => { pg.hidden = pg.dataset.page !== t.dataset.page; });
+  }));
+  $("resetKeys").addEventListener("click", () => { Keys.reset(); Keys.renderSettings($("bindList"), $("clickList")); });
+  $("copyMail").addEventListener("click", async (e) => {
+    try {
+      await navigator.clipboard.writeText(dlg.querySelector(".about-mail").textContent);
+      e.target.textContent = "已复制 ✓";
+    } catch (err) {
+      e.target.textContent = "复制失败，请手动选中";
+    }
+    setTimeout(() => { e.target.textContent = "复制"; }, 1800);
   });
 
   let raf = 0;
   new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => drawMap(false)); }).observe($("stones"));
 
   // ---------- 启动 ----------
-  Titlebar.mount($("tb"), { title: "雾见", sub: Api.real ? "" : "模拟数据" });
+  const GEAR = '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4"/></svg>';
+  Titlebar.mount($("tb"), { title: "雾见", sub: Api.real ? "" : "模拟数据",
+    actions: [{ icon: GEAR, label: "设置", onClick: openSettings }] });
   Theme.picker($("picker"), { system: true });
   renderDrives();
 })();

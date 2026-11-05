@@ -26,9 +26,6 @@
       <button class="btn soft" id="pickFolder">扫描某个文件夹…</button>
       <span class="faint hint-line">只看不删：雾见不会改动你的任何文件</span>
     </div>
-    <footer class="home-foot">
-      <div id="picker"></div>
-    </footer>
   </div>
 </section>
 
@@ -47,13 +44,21 @@
 <!-- ③ 结果：石子路 -->
 <section class="screen" id="result" hidden>
   <nav class="crumbs-bar">
-    <button class="btn ghost icon" id="goUp" data-tip="上一层（Backspace）" data-tip-pos="bottom" aria-label="上一层">
-      <svg viewBox="0 0 16 16" width="16" height="16"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
+    <div class="nav-btns">
+      <button class="btn ghost icon" id="goBack" data-tip="后退" data-tip-pos="bottom" data-tip-align="start" aria-label="后退">
+        <svg viewBox="0 0 16 16" width="16" height="16"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="btn ghost icon" id="goForward" data-tip="前进" data-tip-pos="bottom" aria-label="前进">
+        <svg viewBox="0 0 16 16" width="16" height="16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="btn ghost icon" id="goUp" data-tip="上一层" data-tip-pos="bottom" aria-label="上一层">
+        <svg viewBox="0 0 16 16" width="16" height="16"><path d="M3 10l5-5 5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
     <div class="crumbs" id="crumbs"></div>
     <button class="btn ghost sm" id="reveal">在资源管理器中显示</button>
     <button class="btn ghost sm" id="rescan">重新扫描</button>
-    <button class="btn ghost sm" id="goHome">换一个</button>
+    <button class="btn ghost sm" id="goHome" data-tip="回到选磁盘的首页" data-tip-pos="bottom" data-tip-align="end">换一个</button>
   </nav>
   <div class="map" id="map">
     <div class="stones" id="stones"></div>
@@ -66,10 +71,79 @@
   </div>
 </section>
 
+<!-- 设置 -->
+<dialog class="settings" id="settings">
+  <div class="set-head">
+    <h2>设置</h2>
+    <button class="btn ghost icon" id="closeSettings" aria-label="关闭设置">✕</button>
+  </div>
+  <div class="set-tabs" role="tablist">
+    <button class="set-tab" role="tab" data-page="look" aria-selected="true">外观</button>
+    <button class="set-tab" role="tab" data-page="keys" aria-selected="false">按键</button>
+    <button class="set-tab" role="tab" data-page="help" aria-selected="false">使用说明</button>
+    <button class="set-tab" role="tab" data-page="about" aria-selected="false">关于</button>
+  </div>
+  <div class="set-body">
+    <section class="set-page" data-page="look">
+      <h3>主题</h3>
+      <div id="picker"></div>
+    </section>
+
+    <section class="set-page" data-page="keys" hidden>
+      <h3>导航</h3>
+      <p>点“+”之后按下想用的键或鼠标按键（侧键、中键都可以），按 Esc 取消。</p>
+      <div id="bindList"></div>
+      <h3>点石子</h3>
+      <div id="clickList"></div>
+      <p style="margin-top: var(--sp-4)"><button class="btn sm" id="resetKeys">恢复默认按键</button></p>
+    </section>
+
+    <section class="set-page" data-page="help" hidden>
+      <h3>三步看清磁盘 🌫️</h3>
+      <ul>
+        <li><b>选位置</b>：首页点一个磁盘，或者“扫描某个文件夹…”</li>
+        <li><b>等它扫完</b>：几十万个文件一般几秒钟，可以随时取消</li>
+        <li><b>看石子</b>：石子越大，占的空间越多。鼠标移上去，左下角显示名字、大小和占比</li>
+      </ul>
+      <h3>怎么操作</h3>
+      <ul>
+        <li><b>左键</b>点文件夹石子：进入这个文件夹</li>
+        <li><b>右键</b>点石子：在文件管理器里打开它</li>
+        <li><b>后退 / 前进</b>：鼠标侧键（靠下的后退，靠上的前进），或者左上角的箭头，跟 Windows 文件管理器一样。在最外层再后退，就回到选磁盘的首页</li>
+        <li>这些按键都可以在“按键”里改</li>
+      </ul>
+      <h3>石子上的几种样子</h3>
+      <ul>
+        <li><b>有颜色的石子</b>：文件夹，里面的小石子是它装的东西</li>
+        <li><b>白色石子</b>：单个大文件</li>
+        <li><b>虚线框“零散小文件”</b>：小于 1 MB 的文件合在一起（太多了，单独画看不清）</li>
+        <li><b>虚线框“其余 N 项”</b>：太小、没有单独画出来的文件夹和文件</li>
+      </ul>
+      <h3>常见问题</h3>
+      <ul>
+        <li><b>为什么扫出来比“已用空间”少一点？</b> 有些系统文件夹需要管理员权限才能读取，雾见会跳过它们，扫完后左下角会写跳过了几个。右键雾见 → 以管理员身份运行，就能扫到</li>
+        <li><b>雾见会删我的文件吗？</b> 不会。雾见只读取文件大小，不会改动、移动或删除任何文件</li>
+      </ul>
+    </section>
+
+    <section class="set-page" data-page="about" hidden>
+      <h3>雾见 <span class="faint num" style="font-weight: 400">v0.1.0</span></h3>
+      <p>拨开雾，看看磁盘空间都去哪了。</p>
+      <p>由 <b>大雾</b> 和 <b>Claude</b> 一起做的 🧡</p>
+      <h3>联系我们</h3>
+      <p>发现问题或者有想法，欢迎写邮件：<br><span class="about-mail">today.is.foggy.0x21@gmail.com</span>
+        <button class="btn ghost sm" id="copyMail">复制</button></p>
+      <h3>开源授权</h3>
+      <p>代码：MIT · 字体：Nunito、975 圆体（SIL OFL 1.1）</p>
+    </section>
+  </div>
+</dialog>
+
 <script src="设计包/组件/标题栏.js"></script>
 <script src="mock.js"></script>
 <script src="api.js"></script>
 <script src="layout.js"></script>
+<script src="keys.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

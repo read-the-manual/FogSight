@@ -128,7 +128,8 @@ textarea.field { height: auto; min-height: 80px; padding: var(--sp-2) var(--sp-3
 @keyframes progress-busy { from { transform: translateX(-100%); } to { transform: translateX(340%); } }
 
 /* ---------- 提示气泡 ---------- */
-/* 用法：任意元素加 data-tip="提示文字"；加 data-tip-pos="bottom" 显示在下方 */
+/* 用法：任意元素加 data-tip="提示文字"；加 data-tip-pos="bottom" 显示在下方；
+   贴着窗口左边 / 右边的元素加 data-tip-align="start" / "end"，气泡就不会超出窗口被切掉 */
 [data-tip] { position: relative; }
 [data-tip]::after {
   content: attr(data-tip);
@@ -143,6 +144,9 @@ textarea.field { height: auto; min-height: 80px; padding: var(--sp-2) var(--sp-3
 [data-tip]:hover::after, [data-tip]:focus-visible::after {
   opacity: 1; transform: translate(-50%, 0); transition-delay: 300ms;
 }
+[data-tip][data-tip-align="start"]::after { left: 0; transform: translate(0, 4px); }
+[data-tip][data-tip-align="end"]::after { left: auto; right: 0; transform: translate(0, 4px); }
+[data-tip][data-tip-align]:hover::after, [data-tip][data-tip-align]:focus-visible::after { transform: none; }
 
 /* ---------- 自绘标题栏 ---------- */
 /* 配合 Tauri 的 decorations: false 使用，标题栏和界面同色，不会出现白边。见 组件/标题栏.js */
@@ -155,6 +159,8 @@ textarea.field { height: auto; min-height: 80px; padding: var(--sp-2) var(--sp-3
 .titlebar .tb-title { flex: 1; display: flex; align-items: center; gap: var(--sp-2); height: 100%; }
 .titlebar .tb-title b { color: var(--fg); font-weight: var(--fw-medium); }
 .titlebar .tb-btns { display: flex; height: 100%; }
+.titlebar .tb-actions { display: flex; height: 100%; }
+.titlebar .tb-actions .tb-btn svg { width: 15px; height: 15px; stroke-width: 1.5; }
 .titlebar .tb-btn {
   display: grid; place-items: center; width: 46px; height: 100%;
   color: var(--dim); background: transparent; border: 0; cursor: pointer;

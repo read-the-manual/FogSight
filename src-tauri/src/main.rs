@@ -140,7 +140,7 @@ fn view(state: State<'_, App>, trail: Vec<u32>) -> Result<ViewNode, String> {
     Ok(scan::view(node, -1, &[90, 30]))
 }
 
-/// 在资源管理器里选中它（只是打开看看，不会改动任何文件）
+/// 在文件管理器里打开它（只是打开看看，不会改动任何文件）
 #[tauri::command]
 fn reveal(state: State<'_, App>, trail: Vec<u32>) -> Result<(), String> {
     let guard = state.result.lock().unwrap();
@@ -151,7 +151,8 @@ fn reveal(state: State<'_, App>, trail: Vec<u32>) -> Result<(), String> {
         n = n.children.get(i as usize).ok_or("这个位置不存在了，可能需要重新扫描")?;
         path.push(&*n.name);
     }
-    let arg = if trail.is_empty() { path.display().to_string() } else { format!("/select,{}", path.display()) };
+    // 文件夹直接打开；文件在它所在的文件夹里被选中
+    let arg = if n.is_dir { path.display().to_string() } else { format!("/select,{}", path.display()) };
     std::process::Command::new("explorer")
         .arg(arg)
         .spawn()
