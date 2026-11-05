@@ -239,6 +239,9 @@
   function showCorner(it) {
     const v = st.view;
     if (!v) return;
+    // 提示跟着按键设置走：改成别的键就写别的键，谁都不打开就不显示
+    const eb = Keys.explorerButton();
+    $("cHint").textContent = eb ? `${eb}色块，可以直接在文件管理器中打开` : "";
     const s = st.summary;
     if (!it) {
       $("cKind").textContent = st.trail.length ? "当前文件夹" : `扫描完成 · 用时 ${(s.millis / 1000).toFixed(1)} 秒`;

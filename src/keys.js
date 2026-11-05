@@ -129,5 +129,7 @@
     match, reset, renderSettings,
     isRecording: () => !!recording,
     clickAction: (btn) => cfg.click[btn],
+    // 哪个鼠标键被设成了“在文件管理器中打开”，给提示文字用；没有就是 null
+    explorerButton: () => { const b = Object.keys(cfg.click).find((k) => cfg.click[k] === "explorer"); return b ? CLICK_BUTTONS[b] : null; },
   };
 })();
