@@ -3,6 +3,7 @@ window.THEME_LIST = [
   {
     "id": "paper",
     "name": "纸色",
+    "name_en": "Paper",
     "scheme": "light",
     "bg": "#f4efe6",
     "accent": "#3d352e"
@@ -10,6 +11,7 @@ window.THEME_LIST = [
   {
     "id": "dark",
     "name": "深色",
+    "name_en": "Dark",
     "scheme": "dark",
     "bg": "#151515",
     "accent": "#e8e6e3"
@@ -17,6 +19,7 @@ window.THEME_LIST = [
   {
     "id": "claude",
     "name": "Claude 橙",
+    "name_en": "Claude Orange",
     "scheme": "light",
     "bg": "#f8f5ee",
     "accent": "#D97757"
@@ -24,6 +27,7 @@ window.THEME_LIST = [
   {
     "id": "seaglass",
     "name": "海青",
+    "name_en": "Sea Glass",
     "scheme": "dark",
     "bg": "#16191d",
     "accent": "#A9D3C5"
@@ -31,6 +35,7 @@ window.THEME_LIST = [
   {
     "id": "rose",
     "name": "粉玫",
+    "name_en": "Rose",
     "scheme": "dark",
     "bg": "#1d1719",
     "accent": "#E8A9BC"

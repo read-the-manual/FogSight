@@ -193,3 +193,28 @@ body { display: flex; flex-direction: column; overflow: hidden; user-select: non
 .confirm-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 var(--sp-3); padding: var(--sp-2) var(--sp-3); background: var(--card); border-radius: var(--r-sm); }
 .confirm-list li .clean-effect { flex-basis: 100%; }
 .confirm-total { text-align: right; }
+
+/* ---------- 中英双语 ---------- */
+/* 长段落写两份，按 <html lang> 只显示一份（由 i18n.js 设置） */
+html[lang="en"] [data-only="zh"],
+html:not([lang="en"]) [data-only="en"] { display: none !important; }
+
+/* 首页角落那句小小的语言提示：不抢眼，鼠标移上去才清楚一点 */
+.lang-hint {
+  margin-right: auto;
+  font: inherit; font-size: var(--fs-xs); color: var(--faint);
+  background: none; border: 0; padding: var(--sp-1) 0; cursor: pointer;
+  transition: color var(--dur-fast) var(--ease);
+}
+.lang-hint:hover { color: var(--dim); text-decoration: underline; text-underline-offset: 3px; }
+
+/* 设置里的语言选择，长得和主题色块一样 */
+.lang-pick { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.lang-opt {
+  display: inline-flex; align-items: center; height: 32px; padding: 0 var(--sp-3);
+  font: inherit; font-size: var(--fs-sm); color: var(--fg);
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--r-pill);
+  cursor: pointer; transition: border-color var(--dur-fast) var(--ease);
+}
+.lang-opt:hover { border-color: var(--faint); }
+.lang-opt[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }

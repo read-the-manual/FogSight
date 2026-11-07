@@ -11,6 +11,7 @@
     return `${b.toFixed(d)} ${UNITS[i]}`;
   }
   const fmtNum = (n) => Math.round(n).toLocaleString("en-US");
+  const t = I18n.t;
   const show = (id) => document.querySelectorAll(".screen").forEach((s) => { s.hidden = s.id !== id; });
 
   // ---------- 状态 ----------
@@ -34,9 +35,9 @@
       b.innerHTML = `
         <div class="drive-top"><span class="drive-letter"></span><span class="drive-label"></span></div>
         <div class="progress" style="--p: ${(used / d.total * 100).toFixed(1)}%"></div>
-        <div class="drive-nums num"><span>已用 <b>${fmtSize(used)}</b></span><span>共 ${fmtSize(d.total)}</span></div>`;
+        <div class="drive-nums num"><span>${t("drive.used", { s: `<b>${fmtSize(used)}</b>` })}</span><span>${t("drive.total", { s: fmtSize(d.total) })}</span></div>`;
       b.querySelector(".drive-letter").textContent = d.mount.replace(/\\$/, "");
-      b.querySelector(".drive-label").textContent = d.label || "本地磁盘";
+      b.querySelector(".drive-label").textContent = d.label || t("drive.local");
       b.addEventListener("click", () => startScan(d.mount, used));
       return b;
     }));
@@ -46,13 +47,13 @@
     try {
       const p = await Api.pickFolder();
       if (p) startScan(p, 0);
-    } catch (e) { alert("打不开选择文件夹的窗口：" + e); }
+    } catch (e) { alert(t("err.picker") + I18n.err(e)); }
   });
 
   // ---------- ② 扫描 ----------
   Api.onProgress((p) => {
     $("scanFiles").textContent = fmtNum(p.files);
-    $("scanBytes").textContent = `已找到 ${fmtSize(p.bytes)}`;
+    $("scanBytes").textContent = t("scan.found", { s: fmtSize(p.bytes) });
     if (st.used) $("scanBar").style.setProperty("--p", Math.min(99, p.bytes / st.used * 100) + "%");
     if (p.current) $("scanPath").textContent = p.current;
     $("scanHint").hidden = !p.hdd;
@@ -60,9 +61,9 @@
 
   async function startScan(path, used) {
     Object.assign(st, { path, used, trail: [], names: [], picked: null });
-    $("scanTitle").textContent = `正在扫描 ${path}`;
+    $("scanTitle").textContent = t("scan.titlePath", { p: path });
     $("scanFiles").textContent = "0";
-    $("scanBytes").textContent = "已找到 0 B";
+    $("scanBytes").textContent = t("scan.found", { s: "0 B" });
     $("scanPath").innerHTML = "&nbsp;";
     $("scanBar").classList.toggle("busy", !used);
     $("scanBar").style.setProperty("--p", "0%");
@@ -78,7 +79,7 @@
       pos = 1;
       await render();
     } catch (e) {
-      alert("扫描失败：" + e);
+      alert(t("scan.failed") + I18n.err(e));
       show("home");
     }
   }
@@ -144,7 +145,9 @@
     });
   }
 
-  const KIND = { dir: "文件夹", file: "文件", small: "零散小文件（每个都小于 1 MB）", other: "太小没单独画出来的项目" };
+  // 色块上显示的名字。“零散小文件”“其余 N 项”是 Rust 合成出来的，按种类换成当前语言；
+  // 色块的形状仍用原名算（Layout.pebbleRadius），切换语言时形状不会变。
+  const dispName = (it) => it.kind === "small" ? t("name.small") : it.kind === "other" ? t("name.other", { n: fmtNum(it.count) }) : it.name;
 
   function drawMap(animate) {
     const box = $("stones");
@@ -173,7 +176,7 @@
         lab.className = "stone-label";
         const n = document.createElement("div");
         n.className = "stone-name";
-        n.textContent = it.name;
+        n.textContent = dispName(it);
         lab.append(n);
         labelH = 30;
         if (h > 46) {
@@ -202,7 +205,7 @@
             lab.className = "pebble-label";
             const n = document.createElement("div");
             n.className = "pebble-name";
-            n.textContent = kids[j].name;
+            n.textContent = dispName(kids[j]);
             lab.append(n);
             if (q.h >= 52) {
               const sz = document.createElement("div");
@@ -244,26 +247,26 @@
     if (!v) return;
     // 提示跟着按键设置走：改成别的键就写别的键，谁都不打开就不显示
     const eb = Keys.explorerButton();
-    $("cHint").textContent = eb ? `${eb}色块，可以直接在文件管理器中打开` : "";
+    $("cHint").textContent = eb ? t("corner.hint." + eb) : "";
     const s = st.summary;
     if (!it) {
-      $("cKind").textContent = st.trail.length ? "当前文件夹" : `扫描完成 · 用时 ${(s.millis / 1000).toFixed(1)} 秒`;
+      $("cKind").textContent = st.trail.length ? t("corner.current") : t("corner.done", { s: (s.millis / 1000).toFixed(1) });
       $("cName").textContent = st.names[st.names.length - 1];
       $("cSize").textContent = fmtSize(v.size);
       $("cPct").textContent = "";
-      const parts = [`${fmtNum(v.files)} 个文件`, `${fmtNum(v.count)} 项`];
-      if (!st.trail.length && s.denied) parts.push(`${fmtNum(s.denied)} 个文件夹没有权限读取，已跳过`);
+      const parts = [t("corner.files", { n: fmtNum(v.files) }), t("corner.items", { n: fmtNum(v.count) })];
+      if (!st.trail.length && s.denied) parts.push(t("corner.denied", { n: fmtNum(s.denied) }));
       $("cMeta").textContent = parts.join(" · ");
       return;
     }
-    $("cKind").textContent = KIND[it.kind];
-    $("cName").textContent = it.name;
+    $("cKind").textContent = t("kind." + it.kind);
+    $("cName").textContent = dispName(it);
     $("cSize").textContent = fmtSize(it.size);
     $("cPct").textContent = v.size ? `${(it.size / v.size * 100).toFixed(1)}%` : "";
     const parts = [];
-    if (it.kind !== "file") parts.push(`${fmtNum(it.files)} 个文件`);
-    if (it.kind === "dir" && it.denied) parts.push("没有权限读取");
-    if (it.kind === "other") parts.push(`共 ${fmtNum(it.count)} 项`);
+    if (it.kind !== "file") parts.push(t("corner.files", { n: fmtNum(it.files) }));
+    if (it.kind === "dir" && it.denied) parts.push(t("corner.noPerm"));
+    if (it.kind === "other") parts.push(t("corner.total", { n: fmtNum(it.count) }));
     $("cMeta").textContent = parts.join(" · ");
   }
 
@@ -274,7 +277,7 @@
   // 在文件管理器里打开：文件夹直接打开，文件会被选中；合成出来的块打开当前文件夹
   function reveal(it) {
     const trail = it && it.idx >= 0 ? [...st.trail, it.idx] : st.trail;
-    Api.reveal(trail).catch((e) => alert("打不开文件管理器：" + e));
+    Api.reveal(trail).catch((e) => alert(t("err.explorer") + I18n.err(e)));
   }
 
   $("goBack").addEventListener("click", back);
@@ -308,25 +311,27 @@
 
   // ---------- 设置 ----------
   const dlg = $("settings");
-  function openSettings() {
+  function openSettings(page) {
     Keys.renderSettings($("bindList"), $("clickList"));
+    if (typeof page === "string") selectTab(page);
     dlg.showModal();
+  }
+  function selectTab(page) {
+    dlg.querySelectorAll(".set-tab").forEach((x) => x.setAttribute("aria-selected", String(x.dataset.page === page)));
+    dlg.querySelectorAll(".set-page").forEach((pg) => { pg.hidden = pg.dataset.page !== page; });
   }
   $("closeSettings").addEventListener("click", () => dlg.close());
   dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });   // 点窗口外面关掉
-  dlg.querySelectorAll(".set-tab").forEach((t) => t.addEventListener("click", () => {
-    dlg.querySelectorAll(".set-tab").forEach((x) => x.setAttribute("aria-selected", String(x === t)));
-    dlg.querySelectorAll(".set-page").forEach((pg) => { pg.hidden = pg.dataset.page !== t.dataset.page; });
-  }));
+  dlg.querySelectorAll(".set-tab").forEach((tab) => tab.addEventListener("click", () => selectTab(tab.dataset.page)));
   $("resetKeys").addEventListener("click", () => { Keys.reset(); Keys.renderSettings($("bindList"), $("clickList")); });
   $("copyMail").addEventListener("click", async (e) => {
     try {
       await navigator.clipboard.writeText(dlg.querySelector(".about-mail").textContent);
-      e.target.textContent = "已复制 ✓";
+      e.target.textContent = t("copy.ok");
     } catch (err) {
-      e.target.textContent = "复制失败，请手动选中";
+      e.target.textContent = t("copy.fail");
     }
-    setTimeout(() => { e.target.textContent = "复制"; }, 1800);
+    setTimeout(() => { e.target.textContent = t("copy"); }, 1800);
   });
 
   let raf = 0;
@@ -335,11 +340,32 @@
   // ---------- 启动 ----------
   // 齿轮图标来自 Lucide（lucide.dev，ISC 授权）
   const GEAR = '<svg viewBox="0 0 24 24" style="stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>';
-  Titlebar.mount($("tb"), { title: "雾见", sub: Api.real ? "" : "模拟数据",
-    actions: [{ icon: GEAR, label: "设置", onClick: openSettings }] });
-  Theme.picker($("picker"), { system: true });
-  Theme.picker($("pickerHome"), { system: true });   // 首页底部也放一份，两边会同步
+  // 这些部件里的文字是 JS 生成的，换语言时要重画一遍
+  function drawChrome() {
+    Titlebar.mount($("tb"), { title: t("app.name"), sub: Api.real ? "" : t("mock"),
+      actions: [{ icon: GEAR, label: t("home.settings"), onClick: openSettings }] });
+    Theme.picker($("picker"), { system: true });
+    Theme.picker($("pickerHome"), { system: true });   // 首页底部也放一份，两边会同步
+    document.querySelectorAll(".lang-opt").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === I18n.lang())));
+  }
+
+  // ---------- 中英双语 ----------
+  document.querySelectorAll(".lang-opt").forEach((b) => b.addEventListener("click", () => I18n.set(b.dataset.lang)));
+  // 首页角落的小提示：点一下直接打开设置的“外观”页，语言选择就在最上面
+  $("langHint").addEventListener("click", () => openSettings("look"));
+  document.addEventListener("langchange", () => {
+    drawChrome();
+    if (dlg.open) Keys.renderSettings($("bindList"), $("clickList"));
+    const h = here();
+    if (h.home) renderDrives();
+    else if (h.clean) Clean.relabel();
+    else if (st.view) { drawCrumbs(); drawMap(false); showCorner(st.picked); }
+    if (!$("scanning").hidden) $("scanTitle").textContent = t("scan.titlePath", { p: st.path });
+  });
+
+  I18n.apply();
+  drawChrome();
   $("openSettings").insertAdjacentHTML("afterbegin", GEAR);
-  $("openSettings").addEventListener("click", openSettings);
+  $("openSettings").addEventListener("click", () => openSettings());
   renderDrives();
 })();

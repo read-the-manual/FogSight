@@ -22,15 +22,18 @@
 
   function mount(el, opts = {}) {
     el.classList.add("titlebar");
+    // 按钮的读屏文字跟着 <html lang> 走；切换语言后再 mount 一次即可
+    const en = (document.documentElement.lang || "").toLowerCase().startsWith("en");
+    const L = en ? { min: "Minimize", max: "Maximize", close: "Close" } : { min: "最小化", max: "最大化", close: "关闭" };
     el.innerHTML = `
       <div class="tb-title" data-tauri-drag-region>
         <b data-tauri-drag-region></b><span class="faint" data-tauri-drag-region></span>
       </div>
       <div class="tb-btns">
         <span class="tb-actions"></span>
-        <button class="tb-btn" data-act="minimize" aria-label="最小化">${ICONS.min}</button>
-        <button class="tb-btn" data-act="toggleMaximize" aria-label="最大化">${ICONS.max}</button>
-        <button class="tb-btn close" data-act="close" aria-label="关闭">${ICONS.close}</button>
+        <button class="tb-btn" data-act="minimize" aria-label="${L.min}">${ICONS.min}</button>
+        <button class="tb-btn" data-act="toggleMaximize" aria-label="${L.max}">${ICONS.max}</button>
+        <button class="tb-btn close" data-act="close" aria-label="${L.close}">${ICONS.close}</button>
       </div>`;
     // 标题用 textContent 填，防止标题里的字符被当成 HTML
     el.querySelector("b").textContent = opts.title || document.title;

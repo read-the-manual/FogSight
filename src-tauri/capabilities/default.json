@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "雾见主窗口需要的权限：窗口按钮、拖动、主题、事件、选择文件夹",
+  "description": "雾见主窗口需要的权限：窗口按钮、拖动、主题、窗口标题（跟着语言换）、事件、选择文件夹",
   "windows": ["main"],
   "permissions": [
     "core:default",
@@ -10,6 +10,7 @@
     "core:window:allow-close",
     "core:window:allow-start-dragging",
     "core:window:allow-set-theme",
+    "core:window:allow-set-title",
     "dialog:allow-open"
   ]
 }

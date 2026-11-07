@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="设计包/css/基础.css">
 <link rel="stylesheet" href="设计包/css/组件.css">
 <link rel="stylesheet" href="app.css">
+<script src="i18n.js"></script>
 <script src="设计包/组件/主题列表.js"></script>
 <script src="设计包/组件/主题.js"></script>
 <script>Theme.init()</script>
@@ -18,18 +19,19 @@
 <section class="screen" id="home">
   <div class="home-inner">
     <header class="brand">
-      <h1>雾见</h1>
-      <p class="dim">拨开雾，看看磁盘空间都去哪了</p>
+      <h1 data-i18n="app.name">雾见</h1>
+      <p class="dim" data-i18n="home.tagline">拨开雾，看看磁盘空间都去哪了</p>
     </header>
     <div class="drives" id="drives"></div>
     <div class="row">
-      <button class="btn soft" id="pickFolder">扫描某个文件夹…</button>
-      <button class="btn soft" id="openClean">🧹 C 盘专清</button>
-      <span class="faint hint-line">只看不删：雾见不会改动你的任何文件</span>
+      <button class="btn soft" id="pickFolder" data-i18n="home.pickFolder">扫描某个文件夹…</button>
+      <button class="btn soft" id="openClean" data-i18n="home.clean">🧹 C 盘专清</button>
+      <span class="faint hint-line" data-i18n="home.readonly">只看不删：雾见不会改动你的任何文件</span>
     </div>
     <footer class="home-foot">
+      <button class="lang-hint" id="langHint" data-i18n="home.langHint"></button>
       <div id="pickerHome"></div>
-      <button class="btn ghost" id="openSettings">设置</button>
+      <button class="btn ghost" id="openSettings"><span data-i18n="home.settings">设置</span></button>
     </footer>
   </div>
 </section>
@@ -37,13 +39,13 @@
 <!-- ② 扫描中 -->
 <section class="screen" id="scanning" hidden>
   <div class="scan-inner">
-    <div class="dim" id="scanTitle">正在扫描</div>
-    <div class="scan-count num"><span id="scanFiles">0</span><small>个文件</small></div>
-    <div class="dim num" id="scanBytes">已找到 0 B</div>
+    <div class="dim" id="scanTitle" data-i18n="scan.title">正在扫描</div>
+    <div class="scan-count num"><span id="scanFiles">0</span><small data-i18n="scan.files">个文件</small></div>
+    <div class="dim num" id="scanBytes">&nbsp;</div>
     <div class="progress" id="scanBar"></div>
     <div class="faint scan-path" id="scanPath">&nbsp;</div>
-    <div class="faint scan-hint" id="scanHint" hidden>这是机械硬盘：已改成 2 个线程顺着读，减少磁头来回跳</div>
-    <button class="btn ghost" id="cancelScan">取消</button>
+    <div class="faint scan-hint" id="scanHint" data-i18n="scan.hdd" hidden></div>
+    <button class="btn ghost" id="cancelScan" data-i18n="scan.cancel">取消</button>
   </div>
 </section>
 
@@ -51,20 +53,20 @@
 <section class="screen" id="result" hidden>
   <nav class="crumbs-bar">
     <div class="nav-btns">
-      <button class="btn ghost icon" id="goBack" data-tip="后退" data-tip-pos="bottom" data-tip-align="start" aria-label="后退">
+      <button class="btn ghost icon" id="goBack" data-i18n-tip="nav.back" data-tip-pos="bottom" data-tip-align="start">
         <svg viewBox="0 0 16 16" width="16" height="16"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <button class="btn ghost icon" id="goForward" data-tip="前进" data-tip-pos="bottom" aria-label="前进">
+      <button class="btn ghost icon" id="goForward" data-i18n-tip="nav.forward" data-tip-pos="bottom">
         <svg viewBox="0 0 16 16" width="16" height="16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <button class="btn ghost icon" id="goUp" data-tip="上一层" data-tip-pos="bottom" aria-label="上一层">
+      <button class="btn ghost icon" id="goUp" data-i18n-tip="nav.up" data-tip-pos="bottom">
         <svg viewBox="0 0 16 16" width="16" height="16"><path d="M3 10l5-5 5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
     <div class="crumbs" id="crumbs"></div>
-    <button class="btn ghost sm" id="reveal">在资源管理器中显示</button>
-    <button class="btn ghost sm" id="rescan">重新扫描</button>
-    <button class="btn ghost sm" id="goHome" data-tip="回到选磁盘的首页" data-tip-pos="bottom" data-tip-align="end">换一个</button>
+    <button class="btn ghost sm" id="reveal" data-i18n="res.reveal">在资源管理器中显示</button>
+    <button class="btn ghost sm" id="rescan" data-i18n="res.rescan">重新扫描</button>
+    <button class="btn ghost sm" id="goHome" data-i18n="res.home" data-i18n-tiponly="res.homeTip" data-tip-pos="bottom" data-tip-align="end">换一个</button>
   </nav>
   <div class="map" id="map">
     <div class="stones" id="stones"></div>
@@ -81,37 +83,39 @@
 <!-- ④ C 盘专清 -->
 <section class="screen" id="clean" hidden>
   <nav class="crumbs-bar">
-    <button class="btn ghost icon" id="cleanBack" data-tip="后退" data-tip-pos="bottom" data-tip-align="start" aria-label="后退">
+    <button class="btn ghost icon" id="cleanBack" data-i18n-tip="nav.back" data-tip-pos="bottom" data-tip-align="start">
       <svg viewBox="0 0 16 16" width="16" height="16"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
-    <div class="crumbs"><span class="crumb">C 盘专清</span></div>
+    <div class="crumbs"><span class="crumb" data-i18n="clean.title">C 盘专清</span></div>
   </nav>
   <div class="clean-scroll">
     <div class="clean-inner">
       <header>
-        <h2>C 盘专清 🧹</h2>
-        <p class="dim">默认一个都不勾。每一项都写了删掉之后会怎样，看清楚再勾～ 删除是直接删，不进回收站。</p>
+        <h2><span data-i18n="clean.title">C 盘专清</span> 🧹</h2>
+        <p class="dim" data-only="zh">默认一个都不勾。每一项都写了删掉之后会怎样，看清楚再勾～ 删除是直接删，不进回收站。</p>
+        <p class="dim" data-only="en">Nothing is checked by default. Each item tells you what happens after it's deleted, so give it a read before checking～ Deleted files do <b>not</b> go to the Recycle Bin.</p>
       </header>
       <div class="card clean-result" id="cleanResult" hidden></div>
       <div id="cleanList"></div>
     </div>
   </div>
   <footer class="clean-bar">
-    <span class="dim num" id="cleanSum">还没有勾选</span>
-    <button class="btn danger" id="cleanGo" disabled>清理…</button>
+    <span class="dim num" id="cleanSum"></span>
+    <button class="btn danger" id="cleanGo" data-i18n="clean.go" disabled>清理…</button>
   </footer>
 </section>
 
 <!-- 清理前的最后确认 -->
 <dialog class="settings confirm" id="confirmClean">
-  <div class="set-head"><h2>确认清理</h2></div>
+  <div class="set-head"><h2 data-i18n="clean.confirm">确认清理</h2></div>
   <div class="set-body">
-    <p>下面这些会被<b>直接删除，不进回收站，删了就找不回来</b>：</p>
+    <p data-only="zh">下面这些会被<b>直接删除，不进回收站，删了就找不回来</b>：</p>
+    <p data-only="en">The following will be <b>deleted permanently. They skip the Recycle Bin and cannot be recovered</b>:</p>
     <ul class="confirm-list" id="confirmList"></ul>
-    <p class="confirm-total">一共大约 <b class="num" id="confirmTotal"></b></p>
+    <p class="confirm-total"><span data-i18n="clean.total">一共大约</span> <b class="num" id="confirmTotal"></b></p>
     <div class="row" style="justify-content: flex-end; margin-top: var(--sp-4)">
-      <button class="btn ghost" id="confirmCancel">取消</button>
-      <button class="btn danger" id="confirmOk">确认清理</button>
+      <button class="btn ghost" id="confirmCancel" data-i18n="clean.cancel">取消</button>
+      <button class="btn danger" id="confirmOk" data-i18n="clean.ok">确认清理</button>
     </div>
   </div>
 </dialog>
@@ -119,74 +123,127 @@
 <!-- 设置 -->
 <dialog class="settings" id="settings">
   <div class="set-head">
-    <h2>设置</h2>
-    <button class="btn ghost icon" id="closeSettings" aria-label="关闭设置">✕</button>
+    <h2 data-i18n="set.title">设置</h2>
+    <button class="btn ghost icon" id="closeSettings" data-i18n-aria="set.close">✕</button>
   </div>
   <div class="set-tabs" role="tablist">
-    <button class="set-tab" role="tab" data-page="look" aria-selected="true">外观</button>
-    <button class="set-tab" role="tab" data-page="keys" aria-selected="false">按键</button>
-    <button class="set-tab" role="tab" data-page="help" aria-selected="false">使用说明</button>
-    <button class="set-tab" role="tab" data-page="about" aria-selected="false">关于</button>
+    <button class="set-tab" role="tab" data-page="look" aria-selected="true" data-i18n="set.look">外观</button>
+    <button class="set-tab" role="tab" data-page="keys" aria-selected="false" data-i18n="set.keys">按键</button>
+    <button class="set-tab" role="tab" data-page="help" aria-selected="false" data-i18n="set.help">使用说明</button>
+    <button class="set-tab" role="tab" data-page="about" aria-selected="false" data-i18n="set.about">关于</button>
   </div>
   <div class="set-body">
     <section class="set-page" data-page="look">
-      <h3>主题</h3>
+      <!-- 两种语言都写上，看不懂当前语言的人也能找到 -->
+      <h3>Language · 语言</h3>
+      <div class="lang-pick" id="langPick">
+        <button class="lang-opt" data-lang="zh" lang="zh-CN">中文</button>
+        <button class="lang-opt" data-lang="en" lang="en">English</button>
+      </div>
+      <h3 data-i18n="set.theme">主题</h3>
       <div id="picker"></div>
     </section>
 
     <section class="set-page" data-page="keys" hidden>
-      <h3>导航</h3>
-      <p>点“+”之后按下想用的键或鼠标按键（侧键、中键都可以），按 Esc 取消。</p>
+      <h3 data-i18n="keys.nav">导航</h3>
+      <p data-i18n="keys.navHelp"></p>
       <div id="bindList"></div>
-      <h3>点色块</h3>
+      <h3 data-i18n="keys.click">点色块</h3>
       <div id="clickList"></div>
-      <p style="margin-top: var(--sp-4)"><button class="btn sm" id="resetKeys">恢复默认按键</button></p>
+      <p style="margin-top: var(--sp-4)"><button class="btn sm" id="resetKeys" data-i18n="keys.reset">恢复默认按键</button></p>
     </section>
 
     <section class="set-page" data-page="help" hidden>
-      <h3>三步看清磁盘 🌫️</h3>
-      <ul>
-        <li><b>选位置</b>：首页点一个磁盘，或者“扫描某个文件夹…”</li>
-        <li><b>等它扫完</b>：几十万个文件一般几秒钟，可以随时取消</li>
-        <li><b>看色块</b>：色块越大，占的空间越多。鼠标移上去，左下角显示名字、大小和占比</li>
-      </ul>
-      <h3>怎么操作</h3>
-      <ul>
-        <li><b>左键</b>点文件夹色块：进入这个文件夹</li>
-        <li><b>右键</b>点色块：在文件管理器里打开它</li>
-        <li><b>后退 / 前进</b>：鼠标侧键（靠下的后退，靠上的前进），或者左上角的箭头，跟 Windows 文件管理器一样。在最外层再后退，就回到选磁盘的首页</li>
-        <li>这些按键都可以在“按键”里改</li>
-      </ul>
-      <h3>色块上的几种样子</h3>
-      <ul>
-        <li><b>带底色的色块</b>：文件夹，里面的小色块是它装的东西</li>
-        <li><b>白底的色块</b>：单个大文件</li>
-        <li><b>虚线框“零散小文件”</b>：小于 1 MB 的文件合在一起（太多了，单独画看不清）</li>
-        <li><b>虚线框“其余 N 项”</b>：太小、没有单独画出来的文件夹和文件</li>
-      </ul>
-      <h3>C 盘专清</h3>
-      <ul>
-        <li>首页点“C 盘专清”，雾见会列出 C 盘上几个常见的“垃圾”位置和它们的大小</li>
-        <li>每一项都写了<b>删掉之后会怎样</b>，默认一个都不勾，勾了、并在最后确认窗口点“确认清理”才会删</li>
-        <li>删除是直接删，不进回收站。正在使用的文件会自动跳过</li>
-        <li>下载文件夹、微信和 QQ 的聊天文件是你自己的东西，雾见只显示大小，不帮你删</li>
-      </ul>
-      <h3>常见问题</h3>
-      <ul>
-        <li><b>为什么扫出来比“已用空间”少一点？</b> 有些系统文件夹需要管理员权限才能读取，雾见会跳过它们，扫完后左下角会写跳过了几个。右键雾见 → 以管理员身份运行，就能扫到</li>
-        <li><b>雾见会删我的文件吗？</b> 浏览色块的时候不会，只读取文件大小。只有在 C 盘专清里你亲手勾选、确认过的项目才会被删除</li>
-      </ul>
+      <div data-only="zh">
+        <h3>三步看清磁盘 🌫️</h3>
+        <ul>
+          <li><b>选位置</b>：首页点一个磁盘，或者“扫描某个文件夹…”</li>
+          <li><b>等它扫完</b>：几十万个文件一般几秒钟，可以随时取消</li>
+          <li><b>看色块</b>：色块越大，占的空间越多。鼠标移上去，左下角显示名字、大小和占比</li>
+        </ul>
+        <h3>怎么操作</h3>
+        <ul>
+          <li><b>左键</b>点文件夹色块：进入这个文件夹</li>
+          <li><b>右键</b>点色块：在文件管理器里打开它</li>
+          <li><b>后退 / 前进</b>：鼠标侧键（靠下的后退，靠上的前进），或者左上角的箭头，跟 Windows 文件管理器一样。在最外层再后退，就回到选磁盘的首页</li>
+          <li>这些按键都可以在“按键”里改</li>
+        </ul>
+        <h3>色块上的几种样子</h3>
+        <ul>
+          <li><b>带底色的色块</b>：文件夹，里面的小色块是它装的东西</li>
+          <li><b>白底的色块</b>：单个大文件</li>
+          <li><b>虚线框“零散小文件”</b>：小于 1 MB 的文件合在一起（太多了，单独画看不清）</li>
+          <li><b>虚线框“其余 N 项”</b>：太小、没有单独画出来的文件夹和文件</li>
+        </ul>
+        <h3>C 盘专清</h3>
+        <ul>
+          <li>首页点“C 盘专清”，雾见会列出 C 盘上几个常见的“垃圾”位置和它们的大小</li>
+          <li>每一项都写了<b>删掉之后会怎样</b>，默认一个都不勾，勾了、并在最后确认窗口点“确认清理”才会删</li>
+          <li>删除是直接删，不进回收站。正在使用的文件会自动跳过</li>
+          <li>下载文件夹、微信和 QQ 的聊天文件是你自己的东西，雾见只显示大小，不帮你删</li>
+        </ul>
+        <h3>常见问题</h3>
+        <ul>
+          <li><b>为什么扫出来比“已用空间”少一点？</b> 有些系统文件夹需要管理员权限才能读取，雾见会跳过它们，扫完后左下角会写跳过了几个。右键雾见 → 以管理员身份运行，就能扫到</li>
+          <li><b>雾见会删我的文件吗？</b> 浏览色块的时候不会，只读取文件大小。只有在 C 盘专清里你亲手勾选、确认过的项目才会被删除</li>
+        </ul>
+      </div>
+      <div data-only="en">
+        <h3>See your disk in three steps 🌫️</h3>
+        <ul>
+          <li><b>Pick a place</b>: click a drive on the home screen, or “Scan a folder…”</li>
+          <li><b>Wait for the scan</b>: a few hundred thousand files usually take a few seconds, and you can cancel anytime</li>
+          <li><b>Read the blocks</b>: the bigger the block, the more space it takes. Hover over one to see its name, size and share in the lower-left corner</li>
+        </ul>
+        <h3>Controls</h3>
+        <ul>
+          <li><b>Left-click</b> a folder block: open that folder</li>
+          <li><b>Right-click</b> a block: open it in File Explorer</li>
+          <li><b>Back / Forward</b>: mouse side buttons (lower one goes back, upper one goes forward) or the arrows in the top-left, just like File Explorer. Going back from the top level returns to the drive list</li>
+          <li>All of these can be changed under “Controls”</li>
+        </ul>
+        <h3>What the blocks mean</h3>
+        <ul>
+          <li><b>Tinted block</b>: a folder; the small blocks inside are what it contains</li>
+          <li><b>White block</b>: a single large file</li>
+          <li><b>Dashed “Small files”</b>: files under 1 MB grouped together (too many to draw one by one)</li>
+          <li><b>Dashed “N more items”</b>: folders and files too small to draw separately</li>
+        </ul>
+        <h3>C: Drive Cleanup</h3>
+        <ul>
+          <li>Click “C: Drive Cleanup” on the home screen to see a few common junk locations on drive C and how big they are</li>
+          <li>Each item explains <b>what happens after it's deleted</b>. Nothing is checked by default; files are only deleted after you check items and click “Delete now” in the final confirmation</li>
+          <li>Deleted files do not go to the Recycle Bin. Files in use are skipped automatically</li>
+          <li>Your Downloads folder and WeChat / QQ chat files belong to you: FogSight only shows their size and never deletes them</li>
+        </ul>
+        <h3>FAQ</h3>
+        <ul>
+          <li><b>Why is the scanned total a bit smaller than “Used space”?</b> Some system folders can only be read with administrator rights. FogSight skips them and shows how many were skipped in the lower-left corner. Right-click FogSight → Run as administrator to include them</li>
+          <li><b>Will FogSight delete my files?</b> Not while you browse the blocks; it only reads file sizes. Only items you check and confirm yourself in C: Drive Cleanup are deleted</li>
+        </ul>
+      </div>
     </section>
 
     <section class="set-page" data-page="about" hidden>
-      <h3>雾见 <span class="faint num" style="font-weight: 400">v0.1.0</span></h3>
-      <p>拨开雾，看看磁盘空间都去哪了。</p>
-      <p>由 <b>大雾</b> 和 <b>Claude</b> 一起做的 🧡</p>
-      <h3>联系我们</h3>
-      <p>发现问题或者有想法，欢迎写邮件：<br><span class="about-mail">today.is.foggy.0x21@gmail.com</span>
-        <button class="btn ghost sm" id="copyMail">复制</button></p>
-      <h3>开源授权</h3>
-      <p>代码：MIT · 字体：Nunito、975 圆体（SIL OFL 1.1）</p>
+      <h3><span data-i18n="app.name">雾见</span> <span class="faint num" style="font-weight: 400">v0.1.0</span></h3>
+      <div data-only="zh">
+        <p>拨开雾，看看磁盘空间都去哪了。</p>
+        <p>由 <b>大雾</b> 和 <b>Claude</b> 一起做的 🧡</p>
+        <h3>联系我们</h3>
+        <p>发现问题或者有想法，欢迎写邮件：</p>
+      </div>
+      <div data-only="en">
+        <p>FogSight (雾见, “seeing through the fog”): clear the fog, see where your disk space went.</p>
+        <p>Made by <b>大雾</b> and <b>Claude</b> 🧡</p>
+        <h3>Contact</h3>
+        <p>Found a bug or have an idea? Feel free to email us (English is welcome):</p>
+      </div>
+      <p><span class="about-mail">today.is.foggy.0x21@gmail.com</span>
+        <button class="btn ghost sm" id="copyMail" data-i18n="copy">复制</button></p>
+      <h3 data-only="zh">开源授权</h3>
+      <h3 data-only="en">Open source licenses</h3>
+      <p data-only="zh">代码：MIT · 字体：Nunito、975 圆体（SIL OFL 1.1）</p>
+      <p data-only="en">Code: MIT · Fonts: Nunito, 975 Yuan (SIL OFL 1.1)</p>
     </section>
   </div>
 </dialog>

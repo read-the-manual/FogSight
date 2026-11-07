@@ -6,12 +6,14 @@
 //   Theme.picker(容器, {system:true}) 在容器里生成一排主题色块
 //
 // 换主题时会在 document 上发出 "themechange" 事件，detail 里是 {choice, id, scheme}。
+// 主题名跟着 <html lang> 走：lang 以 en 开头就显示英文名。切换语言后再调用一次 picker() 重画。
 (function () {
   const KEY = "设计包.主题";
   const list = window.THEME_LIST || [];
   const media = matchMedia("(prefers-color-scheme: dark)");
   let choice = window.THEME_DEFAULT || "paper";
 
+  const isEn = () => (document.documentElement.lang || "").toLowerCase().startsWith("en");
   const resolve = (c) => (c === "system" ? (media.matches ? "dark" : "paper") : c);
 
   function apply(c) {
@@ -41,10 +43,10 @@
   }
 
   function picker(box, opts = {}) {
-    const items = list.map((t) => ({ id: t.id, name: t.name, bg: t.bg, accent: t.accent }));
+    const items = list.map((t) => ({ id: t.id, name: isEn() ? t.name_en || t.name : t.name, bg: t.bg, accent: t.accent }));
     if (opts.system) {
       const p = list.find((t) => t.id === "paper"), d = list.find((t) => t.id === "dark");
-      items.push({ id: "system", name: "跟随系统", bg: p && p.bg, accent: d && d.bg });
+      items.push({ id: "system", name: isEn() ? "System" : "跟随系统", bg: p && p.bg, accent: d && d.bg });
     }
     box.classList.add("theme-picker");
     box.replaceChildren(...items.map((t) => {

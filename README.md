@@ -7,6 +7,8 @@
 
 由 **大雾** 和 **Claude** 一起做的 🧡
 
+**中文 | [English](#english)**
+
 ## 特点
 
 - **只看不删**：雾见不会改动、删除、移动你的任何文件。唯一会打开的东西是资源管理器（点“在资源管理器中显示”时）。
@@ -14,6 +16,7 @@
   机械硬盘会自动识别，改用 2 个线程顺着读，减少磁头来回跳。
 - **便携**：一个 exe，拷到 U 盘上哪台电脑都能直接打开，不用安装。
   （需要系统里有 WebView2，Windows 10/11 一般都自带。）
+- **中英双语**：默认跟随系统语言，也可以在“设置 → 外观”里随时切换。
 - **五套配色**：纸色、深色、Claude 橙、海青、粉玫，也可以跟随系统。
 
 ## 怎么用
@@ -74,3 +77,37 @@ npm run build    # 编译发布版，生成 src-tauri/target/release/wujian.exe
 
 - 代码：MIT
 - 字体：Nunito 和 975 圆体，都是 SIL OFL 1.1（见 `src/设计包/字体/` 里的两个 OFL 文件）
+
+---
+
+<a id="english"></a>
+
+## English
+
+**FogSight (雾见)** — clear the fog, see where your disk space went.
+
+A disk space visualizer for Windows. It scans a whole drive or a single folder and lays out every folder as a block sized by how much space it takes. Click a block to dive in. Inspired by Kanso on the Mac.
+
+Made by **大雾** and **Claude** 🧡
+
+- **Look, don't touch**: browsing never changes, deletes or moves any of your files.
+- **Fast**: multi-threaded Rust scanner. Drive C with 640,000 files: 4.8 s on the first scan, 2.1 s on a rescan. Hard disk drives are detected automatically and read in order with 2 threads.
+- **Portable**: a single exe that runs from a USB stick on any PC, no install needed (requires WebView2, which Windows 10/11 usually ship with).
+- **Chinese and English**: follows your system language; switch anytime in Settings → Appearance.
+- **Five color themes**: Paper, Dark, Claude Orange, Sea Glass and Rose, or follow the system.
+- **C: Drive Cleanup**: lists common junk locations on drive C and explains what happens if each is deleted. Nothing is checked by default, and nothing is deleted until you confirm.
+
+### How to use
+
+1. Double-click `FogSight.exe` (download it from Releases)
+2. Pick a drive, or “Scan a folder…”
+3. Hover over a block to see its details, click a folder block to open it, and press Backspace or the arrow in the top-left to go back
+
+Some system folders can only be read with administrator rights and are skipped. To include them, right-click the exe → Run as administrator.
+
+### Build it yourself
+
+You need Rust, Node.js and the Visual Studio C++ build tools. See the commands in the Chinese section above.
+
+License: MIT · Fonts: Nunito, 975 Yuan (SIL OFL 1.1)
+

@@ -18,7 +18,7 @@
     openStorageSettings: () => invoke("open_storage_settings"),
     relaunchAdmin: () => invoke("relaunch_admin"),
     pickFolder: () => T.dialog
-      ? T.dialog.open({ directory: true, title: "选一个要扫描的文件夹" })
-      : invoke("plugin:dialog|open", { options: { directory: true, title: "选一个要扫描的文件夹" } }),
+      ? T.dialog.open({ directory: true, title: I18n.t("pick.title") })
+      : invoke("plugin:dialog|open", { options: { directory: true, title: I18n.t("pick.title") } }),
   };
 })();
