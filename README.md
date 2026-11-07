@@ -9,6 +9,8 @@
 
 **中文 | [English](#english)**
 
+![雾见的色块图：每个文件夹按大小铺成一片色块，左下角显示鼠标所指的详情](docs/screenshots/map.png)
+
 ## 特点
 
 - **只看不删**：雾见不会改动、删除、移动你的任何文件。唯一会打开的东西是资源管理器（点“在资源管理器中显示”时）。
@@ -19,9 +21,23 @@
 - **中英双语**：默认跟随系统语言，也可以在“设置 → 外观”里随时切换。
 - **五套配色**：纸色、深色、Claude 橙、海青、粉玫，也可以跟随系统。
 
+## 截图
+
+<table>
+<tr>
+<td width="50%"><img src="docs/screenshots/home.png" alt="首页：选一个磁盘，或者扫描某个文件夹"><br><sub>首页：选一个磁盘，或者扫描某个文件夹</sub></td>
+<td width="50%"><img src="docs/screenshots/clean.png" alt="C 盘专清：每一项都写了删掉之后会怎样"><br><sub>C 盘专清：每一项都写了删掉之后会怎样</sub></td>
+</tr>
+</table>
+
+![五套配色：纸色、深色、Claude 橙、海青、粉玫](docs/screenshots/themes.png)
+<sub>五套配色：纸色、深色、Claude 橙（上排），海青、粉玫（下排）</sub>
+
+<sub>首页是真实截图，其余截图使用模拟数据。</sub>
+
 ## 怎么用
 
-1. 双击 `雾见.exe`
+1. 在 Releases 里下载 `FogSight.exe`，双击打开
 2. 点一个磁盘，或者“扫描某个文件夹…”
 3. 等它扫完，鼠标移到色块上看详情，点文件夹色块进入，按 Backspace 或左上角箭头返回上一层
 
@@ -89,6 +105,10 @@ npm run build    # 编译发布版，生成 src-tauri/target/release/wujian.exe
 A disk space visualizer for Windows. It scans a whole drive or a single folder and lays out every folder as a block sized by how much space it takes. Click a block to dive in. Inspired by Kanso on the Mac.
 
 Made by **大雾** and **Claude** 🧡
+
+![FogSight's block map](docs/screenshots/map.png)
+
+<sub>Screenshots show the Chinese interface with demo data; switch to English in Settings → Appearance. More screenshots are in the Chinese section above.</sub>
 
 - **Look, don't touch**: browsing never changes, deletes or moves any of your files.
 - **Fast**: multi-threaded Rust scanner. Drive C with 640,000 files: 4.8 s on the first scan, 2.1 s on a rescan. Hard disk drives are detected automatically and read in order with 2 threads.
